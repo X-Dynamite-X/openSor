@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login - {{ config('app.name') }}</title>
+    <title>Register - {{ config('app.name') }}</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -17,15 +17,49 @@
             <!-- Logo Container -->
             <div class="text-center mb-8">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo" class="mx-auto h-16 w-auto mb-4">
-                <h2 class="text-4xl font-bold text-white mb-2">Welcome Back!</h2>
-                <p class="text-white/80">Please sign in to your account</p>
+                <h2 class="text-4xl font-bold text-white mb-2">Create Account</h2>
+                <p class="text-white/80">Join our community today</p>
             </div>
 
-            <!-- Login Card -->
+            <!-- Register Card -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
                 <div class="p-8">
-                    <form id="loginForm" class="space-y-6">
+                    <form id="registerForm" class="space-y-6">
                         @csrf
+
+                        <!-- Full Name Fields -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- First Name -->
+                            <div class="space-y-2">
+                                <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    First Name
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-gray-400"></i>
+                                    </div>
+                                    <input id="firstName" name="first_name" type="text" required
+                                        class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
+                                        focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                        dark:bg-gray-700 dark:text-white text-sm"
+                                        placeholder="John">
+                                </div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="space-y-2">
+                                <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Last Name
+                                </label>
+                                <div class="relative">
+                                    <input id="lastName" name="last_name" type="text" required
+                                        class="block w-full pl-3 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
+                                        focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                        dark:bg-gray-700 dark:text-white text-sm"
+                                        placeholder="Doe">
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Email Field -->
                         <div class="space-y-2">
@@ -54,7 +88,7 @@
                                     <i class="fas fa-lock text-gray-400"></i>
                                 </div>
                                 <input id="password" name="password" type="password" required
-                                    class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
+                                    class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
                                     focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
                                     dark:bg-gray-700 dark:text-white text-sm"
                                     placeholder="••••••••">
@@ -66,21 +100,45 @@
                             </div>
                         </div>
 
-                        <!-- Remember Me & Forgot Password -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                <label for="remember" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    Remember me
-                                </label>
+                        <!-- Confirm Password Field -->
+                        <div class="space-y-2">
+                            <label for="passwordConfirmation" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Confirm Password
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </div>
+                                <input id="passwordConfirmation" name="password_confirmation" type="password" required
+                                    class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg
+                                    focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                    dark:bg-gray-700 dark:text-white text-sm"
+                                    placeholder="••••••••">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button type="button" id="togglePasswordConfirmation" class="text-gray-400 hover:text-gray-500">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <a href="{{ route('password.request') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                                Forgot password?
-                            </a>
                         </div>
 
-                        <!-- Login Button -->
+                        <!-- Terms and Conditions -->
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="terms" name="terms" type="checkbox" required
+                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3">
+                                <label for="terms" class="text-sm text-gray-700 dark:text-gray-300">
+                                    I agree to the 
+                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Terms of Service</a>
+                                    and
+                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Register Button -->
                         <div>
                             <button type="submit"
                                 class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg
@@ -88,8 +146,8 @@
                                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
                                 transition duration-150 ease-in-out">
                                 <span class="flex items-center">
-                                    <span class="mr-2">Sign in</span>
-                                    <i class="fas fa-arrow-right"></i>
+                                    <span class="mr-2">Create Account</span>
+                                    <i class="fas fa-user-plus"></i>
                                 </span>
                             </button>
                         </div>
@@ -109,15 +167,15 @@
                 <!-- Footer -->
                 <div class="px-8 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700">
                     <p class="text-sm text-center text-gray-600 dark:text-gray-400">
-                        Don't have an account?
-                        <a href="{{ route('register') }}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                            Create one now
+                        Already have an account?
+                        <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                            Sign in here
                         </a>
                     </p>
                 </div>
             </div>
 
-            <!-- Social Login -->
+            <!-- Social Register -->
             <div class="mt-6">
                 <div class="relative">
                     <div class="absolute inset-0 flex items-center">
@@ -125,7 +183,7 @@
                     </div>
                     <div class="relative flex justify-center text-sm">
                         <span class="px-2 text-white bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-                            Or continue with
+                            Or register with
                         </span>
                     </div>
                 </div>
@@ -151,35 +209,56 @@
     <script>
         $(document).ready(function() {
             // Toggle Password Visibility
-            $('#togglePassword').on('click', function() {
-                const passwordInput = $('#password');
-                const icon = $(this).find('i');
+            function togglePasswordVisibility(inputId, buttonId) {
+                $(buttonId).on('click', function() {
+                    const input = $(inputId);
+                    const icon = $(this).find('i');
+                    
+                    if (input.attr('type') === 'password') {
+                        input.attr('type', 'text');
+                        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                    } else {
+                        input.attr('type', 'password');
+                        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    }
+                });
+            }
 
-                if (passwordInput.attr('type') === 'password') {
-                    passwordInput.attr('type', 'text');
-                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
-                } else {
-                    passwordInput.attr('type', 'password');
-                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
-                }
-            });
+            togglePasswordVisibility('#password', '#togglePassword');
+            togglePasswordVisibility('#passwordConfirmation', '#togglePasswordConfirmation');
 
             // Form Submission
-            $('#loginForm').on('submit', function(e) {
+            $('#registerForm').on('submit', function(e) {
                 e.preventDefault();
-
+                
                 // Add loading state to button
                 const submitButton = $(this).find('button[type="submit"]');
                 const originalContent = submitButton.html();
                 submitButton.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
 
+                // Validate passwords match
+                const password = $('#password').val();
+                const passwordConfirmation = $('#passwordConfirmation').val();
+
+                if (password !== passwordConfirmation) {
+                    $('#errorMessage')
+                        .removeClass('hidden')
+                        .find('.error-text')
+                        .text('Passwords do not match');
+                    submitButton.html(originalContent).prop('disabled', false);
+                    return;
+                }
+
                 $.ajax({
-                    url: '{{ route("login") }}',
+                    url: '{{ route("register") }}',
                     type: 'POST',
                     data: {
+                        first_name: $('#firstName').val(),
+                        last_name: $('#lastName').val(),
                         email: $('#email').val(),
-                        password: $('#password').val(),
-                        remember: $('#remember').is(':checked'),
+                        password: password,
+                        password_confirmation: passwordConfirmation,
+                        terms: $('#terms').is(':checked'),
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
@@ -197,7 +276,7 @@
                             .removeClass('hidden')
                             .find('.error-text')
                             .text(response.message || 'An error occurred');
-
+                        
                         // Shake animation for error
                         $('#errorMessage').addClass('animate-shake');
                         setTimeout(() => {

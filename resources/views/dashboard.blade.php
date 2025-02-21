@@ -1,91 +1,50 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>Dashboard - {{ config('app.name') }}</title>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg border-b border-white border-opacity-20">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-8 w-auto mr-3">
-                    <h1 class="text-2xl font-bold text-white">Dashboard</h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas fa-user text-white"></i>
-                        <span class="text-white">{{ auth()->user()->name }}</span>
+@extends('Layouts.admin')
+@section('content')
+ 
+                <!-- Your existing table content goes here -->
+                <div
+                    class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg rounded-lg overflow-hidden border border-white border-opacity-20">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white divide-opacity-20">
+                            <thead>
+                                <tr>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        ID
+                                    </th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Name</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Email</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Role</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Created At</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white divide-opacity-20" id="usersTableBody">
+                                @include('partials.users-table', ['users' => $users])
+                            </tbody>
+                        </table>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit"
-                            class="flex items-center space-x-2 px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition duration-200">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Logout</span>
-                        </button>
-                    </form>
+                    <div class="px-6 py-4" id="pagination">
+                        @include('partials.pagination', ['users' => $users])
+                    </div>
                 </div>
-            </div>
-        </div>
-    </nav>
+       
+@endsection
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Search Bar -->
-        <div class="mb-6">
-            <div class="relative">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="Search users..."
-                    class="w-full sm:w-96 pl-10 pr-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-            </div>
-        </div>
 
-        <!-- Users Table -->
-        <div
-            class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg rounded-lg overflow-hidden border border-white border-opacity-20">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-white divide-opacity-20">
-                    <thead>
-                        <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">ID
-                            </th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                Name</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                Email</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                Role</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                Created At</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white divide-opacity-20" id="usersTableBody">
-                        @include('partials.users-table', ['users' => $users])
-                    </tbody>
-                </table>
-            </div>
-            <div class="px-6 py-4" id="pagination">
-                @include('partials.pagination', ['users' => $users])
-            </div>
-        </div>
-    </main>
-
+@section('model')
     <!-- Edit Modal -->
-    <div id="editModal"
-        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
         <div
             class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
             <div class="mt-3">
@@ -143,13 +102,16 @@
             </div>
         </div>
     </div>
-
+@endsection("model")
+@section('loding')
     <!-- Loading Indicator -->
     <div id="loadingIndicator"
         class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
     </div>
+@endsection("model")
 
+@section('script')
     <script>
         let currentDeleteId = null;
 
@@ -189,7 +151,7 @@
             if (page) {
                 url = page;
             }
-            showLoading();
+            // showLoading();
 
             $.ajax({
                 url: url,
@@ -284,10 +246,9 @@
                                 },
                                 success: function(response) {
                                     if (response.new_user_html) {
-                                        // إضافة المستخدم الجديد إلى نهاية الجدول
-                                        $('#usersTableBody').append(response.new_user_html);
+                                         // $('#usersTableBody').append(response.new_user_html);
+                                        //  fetchUsers();
                                     }
-                                    // تحديث الترقيم في الجدول إذا لزم الأمر
                                  }
                             });
 
@@ -360,23 +321,4 @@
             }, 3000);
         }
     </script>
-    <style>
-        @keyframes fade-in-down {
-            0% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in-down {
-            animation: fade-in-down 0.3s ease-out;
-        }
-    </style>
-</body>
-
-</html>
+@endsection("script")

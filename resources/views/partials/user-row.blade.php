@@ -1,7 +1,7 @@
 <tr data-user-id="{{ $user->id }}">
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
         {{ $user->id }}
-    </td>
+    </td>e
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 user-name">
         {{ $user->name }}
     </td>

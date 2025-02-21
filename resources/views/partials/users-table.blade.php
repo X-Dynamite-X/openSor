@@ -1,43 +1,35 @@
-@foreach($users as $user)
-    <tr  data-user-id="{{ $user->id }}">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300  user-id" >{{ $user->id }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300  user-name">{{ $user->name }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300  user-email">{{ $user->email }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300  user-role">
-            @if($user->is_admin)
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
-                    Admin
-                </span>
-            @else
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                    User
-                </span>
-            @endif
+@forelse($users as $user)
+    <tr class="hover:bg-white hover:bg-opacity-5 transition-colors duration-200" data-user-id="{{ $user->id }}">
+        <td class="px-6 py-4 whitespace-nowrap text-white user-id">{{ $user->id }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-white user-name">{{ $user->name }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-white user-email">{{ $user->email }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 bg-opacity-20 text-white">
+                {{ $user->role }}
+            </span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-            {{ $user->created_at->format('Y-m-d H:i') }}
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-            <button onclick='openEditModal(@json($user))' class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">
-                Edit
-            </button>
-            <button onclick="openDeleteModal({{ $user->id }})" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                Delete
-            </button>
+        <td class="px-6 py-4 whitespace-nowrap text-white">{{ $user->created_at->format('Y-m-d') }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-white">
+            <div class="flex space-x-2">
+                <button onclick="openEditModal({{ json_encode($user) }})"
+                        class="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition duration-200 transform hover:scale-105">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="openDeleteModal({{ $user->id }})"
+                        class="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition duration-200 transform hover:scale-105">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
         </td>
     </tr>
-@endforeach
-
-
-
-
-
-
-
-
-
-
-
-
-
+@empty
+    <tr>
+        <td colspan="6" class="px-6 py-4 text-center text-white">
+            <div class="flex flex-col items-center justify-center space-y-2">
+                <i class="fas fa-search text-4xl text-white text-opacity-40"></i>
+                <p class="text-white text-opacity-60">No users found</p>
+            </div>
+        </td>
+    </tr>
+@endforelse
 

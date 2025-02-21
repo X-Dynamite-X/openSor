@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/users', [DashboardController::class, 'getUsers'])->name('dashboard.users');
+        Route::delete('/users/{user}', [DashboardController::class, 'destroy']);
+        Route::put('/users/{user}', [DashboardController::class, 'update']);
     });
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/auth/check', [AuthController::class, 'check'])->name('auth.check');

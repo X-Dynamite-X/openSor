@@ -7,10 +7,50 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->ajax()) {
+            $query = User::query();
+            
+            if ($request->has('search')) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('name', 'like', "%{$searchTerm}%")
+                      ->orWhere('email', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            // إذا كان الطلب للحصول على مستخدم جديد بعد الحذف
+            if ($request->get('get_next_user')) {
+                $currentPage = $request->get('current_page', 1);
+                $offset = ($currentPage * 10); // نحسب الـ offset بناءً على الصفحة الحالية
+                
+                $nextUser = $query->skip($offset - 1)->first();
+                
+                if ($nextUser) {
+                    return response()->json([
+                        'success' => true,
+                        'new_user_html' => view('partials.user-row', ['user' => $nextUser])->render()
+                    ]);
+                }
+                
+                return response()->json(['success' => true]);
+            }
+
+            $users = $query->paginate(10);
+
+            if ($request->has('search')) {
+                return response()->json([
+                    'html' => view('partials.users-table', ['users' => $users])->render(),
+                    'pagination' => view('partials.pagination', ['users' => $users])->render()
+                ]);
+            }
+
+            return view('partials.users-table', ['users' => $users]);
+        }
+
         $users = User::paginate(10);
-        return view('dashboard', compact('users'));
+        return view('dashboard', ['users' => $users]);
     }
 
     public function getUsers(Request $request)

@@ -193,22 +193,49 @@
                     type: 'DELETE',
                     success: function(response) {
                         if (response.success) {
-                            // حذف الصف من الجدول مباشرة
+                            // حذف الصف من الجدول
                             $(`tr[data-user-id="${currentDeleteId}"]`).remove();
+                            
+                            // جلب مستخدم جديد إذا كان هناك المزيد من المستخدمين
+                            $.ajax({
+                                url: '{{ route("dashboard.users") }}',
+                                type: 'GET',
+                                data: {
+                                    get_next_user: true,
+                                    current_page: $('.pagination .active span').text()
+                                },
+                                success: function(response) {
+                                    if (response.new_user_html) {
+                                        // إضافة المستخدم الجديد إلى نهاية الجدول
+                                        $('#usersTableBody').append(response.new_user_html);
+                                    }
+                                    // تحديث الترقيم في الجدول إذا لزم الأمر
+                                    updateTableNumbers();
+                                }
+                            });
 
                             // إغلاق نافذة التأكيد
                             closeDeleteModal();
-
-                            // إظهار رسالة نجاح (اختياري)
+                            
+                            // إظهار رسالة نجاح
                             showAlert('User deleted successfully', 'success');
                         }
                     },
                     error: function(xhr) {
-                        // إظهار رسالة خطأ (اختياري)
                         showAlert('Error deleting user', 'error');
                     }
                 });
             }
+        }
+
+        // دالة لتحديث أرقام الصفوف في الجدول
+        function updateTableNumbers() {
+            const currentPage = parseInt($('.pagination .active span').text()) || 1;
+            const startingNumber = (currentPage - 1) * 10;
+            
+            $('#usersTableBody tr').each(function(index) {
+                $(this).find('td:first').text(startingNumber + index + 1);
+            });
         }
 
         // إضافة معالج حدث تقديم نموذج التعديل

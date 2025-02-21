@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'dynamite',
             'email' => 'dynamite@Gmail.com',
+            'password' => bcrypt('123'),
             'is_admin' => true,
         ]);
         User::factory(1000)->create();

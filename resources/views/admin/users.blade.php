@@ -64,21 +64,28 @@
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
             <div class="mt-3">
                 <h3 class="text-xl font-bold text-white mb-4">Add New User</h3>
+                <!-- Add error message container -->
+                <div id="addUserErrors" class="hidden mb-4 p-4 rounded-lg bg-red-500 bg-opacity-20 border border-red-500 text-red-100">
+                    <ul class="list-disc list-inside text-sm"></ul>
+                </div>
                 <form id="addUserForm" class="mt-4">
                     <div class="mb-4">
                         <label class="block text-white text-sm font-medium mb-2">Name</label>
                         <input type="text" id="addName" required
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="name"></span>
                     </div>
                     <div class="mb-4">
                         <label class="block text-white text-sm font-medium mb-2">Email</label>
                         <input type="email" id="addEmail" required
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="email"></span>
                     </div>
                     <div class="mb-4">
                         <label class="block text-white text-sm font-medium mb-2">Password</label>
                         <input type="password" id="addPassword" required
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="password"></span>
                     </div>
                     <div class="mb-6">
                         <label class="relative inline-flex items-center cursor-pointer">
@@ -93,7 +100,7 @@
                             class="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition duration-200 flex items-center">
                             <i class="fas fa-times mr-2"></i>Cancel
                         </button>
-                        <button type="submit"
+                        <button type="submit" id="addUserSubmitBtn"
                             class="px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white transition duration-200 flex items-center">
                             <i class="fas fa-save mr-2"></i>Create User
                         </button>
@@ -108,8 +115,7 @@
         class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center">
         <div class="relative mx-auto p-6 w-full max-w-md transform transition-all">
             <!-- Modal Content -->
-            <div
-                class="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-2xl border border-white border-opacity-20">
+            <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-xl shadow-2xl border border-white border-opacity-20">
                 <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-white border-opacity-20">
                     <div class="flex items-center justify-between">
@@ -118,6 +124,13 @@
                             class="text-white opacity-70 hover:opacity-100 transition-opacity">
                             <i class="fas fa-times"></i>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Error Messages Container -->
+                <div id="editUserErrors" class="hidden mx-6 mt-4">
+                    <div class="bg-red-500 bg-opacity-20 border border-red-500 border-opacity-50 rounded-lg p-4">
+                        <ul class="list-none space-y-2 text-red-100"></ul>
                     </div>
                 </div>
 
@@ -133,6 +146,7 @@
                             </label>
                             <input type="text" id="editName"
                                 class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200">
+                            <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="name"></span>
                         </div>
 
                         <!-- Email Field -->
@@ -142,6 +156,7 @@
                             </label>
                             <input type="email" id="editEmail"
                                 class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200">
+                            <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="email"></span>
                         </div>
 
                         <!-- Active Status Toggle -->
@@ -330,13 +345,85 @@
         }
 
         function closeEditModal() {
+            // إخفاء المودال
             $('#editModal').addClass('hidden');
+
+            // إعادة تعيين النموذج
+            $('#editForm')[0].reset();
+
+            // إعادة تعيين الأخطاء
+            resetEditUserErrors();
+
+            // إعادة تعيين حالة التفعيل
+            const statusText = $('#editActive').closest('label').find('.status-text');
+            statusText.text('Not Active');
+
+            // إزالة أي تأثيرات على الحقول
+            $('#editForm input').removeClass('border-red-500');
+
+            // إعادة تعيين معرف المستخدم
+            $('#editUserId').val('');
+        }
+
+        // دالة لعرض أخطاء التعديل
+        function displayEditUserErrors(errors) {
+            const errorContainer = $('#editUserErrors');
+            const errorList = errorContainer.find('ul');
+            errorList.empty();
+
+            // إعادة تعيين الأخطاء السابقة
+            $('#editForm .error-message').addClass('hidden').text('');
+            $('#editForm input').removeClass('border-red-500');
+
+            if (typeof errors === 'object') {
+                Object.keys(errors).forEach(field => {
+                    const errorMessages = Array.isArray(errors[field]) ? errors[field] : [errors[field]];
+
+                    errorMessages.forEach(errorMsg => {
+                        // تحسين عرض اسم الحقل
+                        const fieldName = field.split('_').map(word =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+
+                        // إضافة رسالة الخطأ إلى القائمة
+                        errorList.append(`
+                            <li class="flex items-center">
+                                <i class="fas fa-exclamation-circle mr-2"></i>
+                                <span class="font-semibold">${fieldName}:</span> ${errorMsg}
+                            </li>
+                        `);
+
+                        // إظهار الخطأ تحت الحقل المعني
+                        const errorSpan = $(`#editForm .error-message[data-for="${field}"]`);
+                        if (errorSpan.length) {
+                            errorSpan.removeClass('hidden').text(errorMsg);
+                            $(`#edit${field.charAt(0).toUpperCase() + field.slice(1)}`).addClass('border-red-500');
+                        }
+                    });
+                });
+
+                errorContainer.removeClass('hidden');
+            }
+        }
+
+        // دالة لإعادة تعيين أخطاء التعديل
+        function resetEditUserErrors() {
+            $('#editUserErrors').addClass('hidden').find('ul').empty();
+            $('#editForm .error-message').addClass('hidden').text('');
+            $('#editForm input').removeClass('border-red-500');
         }
 
         $('#editForm').on('submit', function(e) {
             e.preventDefault();
+            resetEditUserErrors();
+
             const userId = $('#editUserId').val();
             const isActive = $('#editActive').is(':checked');
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalContent = submitBtn.html();
+
+            // تغيير حالة الزر إلى حالة التحميل
+            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...').prop('disabled', true);
 
             $.ajax({
                 url: `/users/${userId}`,
@@ -348,36 +435,31 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        // تحديث الصف في الجدول مباشرة
+                        // تحديث الصف في الجدول
                         const row = $(`tr[data-user-id="${userId}"]`);
                         row.find('.user-name').text(response.user.name);
                         row.find('.user-email').text(response.user.email);
+                        row.find('.user-status').text(isActive ? 'Active' : 'Not Active')
+                            .removeClass('text-red-500 text-green-500')
+                            .addClass(isActive ? 'text-green-500' : 'text-red-500');
 
-                        // تحديث حالة التفعيل في الجدول
-                        const statusCell = row.find('.user-status');
-                        if (isActive) {
-                            statusCell.html(`
-                                <span class="px-3 py-1 inline-flex items-center justify-center text-xs leading-5 font-semibold rounded-full bg-green-100 bg-opacity-20 text-green-400 border border-green-400 border-opacity-20">
-                                    <i class="fas fa-check-circle mr-1"></i>Active
-                                </span>
-                            `);
-                        } else {
-                            statusCell.html(`
-                                <span class="px-3 py-1 inline-flex items-center justify-center text-xs leading-5 font-semibold rounded-full bg-red-100 bg-opacity-20 text-red-400 border border-red-400 border-opacity-20">
-                                    <i class="fas fa-times-circle mr-1"></i>Not Active
-                                </span>
-                            `);
-                        }
-
-                        // إغلاق المودال
                         closeEditModal();
-
-                        // إظهار رسالة نجاح
                         showAlert('User updated successfully', 'success');
                     }
                 },
                 error: function(xhr) {
-                    showAlert('Error updating user', 'error');
+                    const response = xhr.responseJSON;
+                    if (response.errors) {
+                        displayEditUserErrors(response.errors);
+                    } else if (response.message) {
+                        displayEditUserErrors({
+                            general: response.message
+                        });
+                    }
+                },
+                complete: function() {
+                    // إعادة الزر إلى حالته الأصلية
+                    submitBtn.html(originalContent).prop('disabled', false);
                 }
             });
         });
@@ -462,10 +544,63 @@
 
         function closeAddModal() {
             $('#addModal').addClass('hidden');
+            resetAddUserErrors();
+        }
+
+        // Reset error messages
+        function resetAddUserErrors() {
+            $('#addUserErrors').addClass('hidden').find('ul').empty();
+            $('.error-message').addClass('hidden').text('');
+            $('#addUserForm input').removeClass('border-red-500');
+        }
+
+        // Display error messages
+        function displayAddUserErrors(errors) {
+            const errorContainer = $('#addUserErrors');
+            const errorList = errorContainer.find('ul');
+            errorList.empty();
+
+            // Reset previous errors
+            $('.error-message').addClass('hidden').text('');
+            $('#addUserForm input').removeClass('border-red-500');
+
+            // Handle different error response formats
+            if (typeof errors === 'string') {
+                // Single error message
+                errorList.append(`<li>${errors}</li>`);
+                errorContainer.removeClass('hidden');
+            } else if (errors.message && typeof errors.message === 'string') {
+                // Single error message in message property
+                errorList.append(`<li>${errors.message}</li>`);
+                errorContainer.removeClass('hidden');
+            } else {
+                // Multiple validation errors
+                Object.keys(errors).forEach(field => {
+                    const errorMsg = errors[field];
+                    // Add error to the main error container
+                    errorList.append(`<li>${errorMsg}</li>`);
+
+                    // Show error below the specific field
+                    const errorSpan = $(`.error-message[data-for="${field}"]`);
+                    if (errorSpan.length) {
+                        errorSpan.removeClass('hidden').text(errorMsg);
+                        $(`#add${field.charAt(0).toUpperCase() + field.slice(1)}`).addClass('border-red-500');
+                    }
+                });
+                errorContainer.removeClass('hidden');
+            }
         }
 
         $('#addUserForm').on('submit', function(e) {
             e.preventDefault();
+
+            // Reset previous errors
+            resetAddUserErrors();
+
+            // Disable submit button and show loading state
+            const submitBtn = $('#addUserSubmitBtn');
+            const originalContent = submitBtn.html();
+            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Loading...').prop('disabled', true);
 
             $.ajax({
                 url: '/users',
@@ -475,11 +610,12 @@
                     email: $('#addEmail').val(),
                     password: $('#addPassword').val(),
                     is_active: $('#addActive').is(':checked') ? 'active' : 'not_active',
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(response) {
                     if (response.success) {
                         // Refresh the table
-                        // fetchUsers();
+                        fetchUsers();
 
                         // Close modal
                         closeAddModal();
@@ -489,7 +625,12 @@
                     }
                 },
                 error: function(xhr) {
-                    showAlert('Error adding user', 'error');
+                    const response = xhr.responseJSON;
+                    displayAddUserErrors(response.errors || response.message || 'An error occurred');
+                },
+                complete: function() {
+                    // Restore submit button state
+                    submitBtn.html(originalContent).prop('disabled', false);
                 }
             });
         });

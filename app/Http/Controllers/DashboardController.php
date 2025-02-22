@@ -71,7 +71,7 @@ class DashboardController extends Controller
     }
     public function store(Request $request)
     {
-        try {
+        
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
@@ -100,18 +100,7 @@ class DashboardController extends Controller
             }
 
             return redirect()->back()->with('success', 'User added successfully');
-        } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error adding user: ' . $e->getMessage()
-                ], 422);
-            }
 
-            return redirect()->back()
-                ->withErrors(['error' => 'Error adding user'])
-                ->withInput();
-        }
     }
     public function update(Request $request, User $user)
     {

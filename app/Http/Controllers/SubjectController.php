@@ -53,12 +53,34 @@ class SubjectController extends Controller
         $subjects = Subject::paginate(10);
         return view('admin.subject', ['subjects' => $subjects]);
     }
+  public function store(Request $request)
+    {
+
+            $validated = $request->validate([
+                'name' => 'required|string|min:3|max:255' ,
+                'mark' => 'required|numeric|min:0|max:100'
+            ]);
+
+            $subject = Subject::create($validated);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'subject' => $subject,
+                    'message' => 'Subject added successfully'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Subject added successfully');
+
+
+    }
 
     public function update(Request $request, Subject $subject)
     {
-        try {
+
             $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:subjects,name,' . $subject->id,
+                'name' => 'required|string|min:3|max:255' ,
                 'mark' => 'required|numeric|min:0|max:100'
             ]);
 
@@ -75,18 +97,7 @@ class SubjectController extends Controller
 
             return redirect()->back()->with('success', 'Subject updated successfully');
 
-        } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error updating subject: ' . $e->getMessage()
-                ], 422);
-            }
 
-            return redirect()->back()
-                ->withErrors(['error' => 'Error updating subject'])
-                ->withInput();
-        }
     }
 
     public function destroy(Subject $subject)
@@ -102,38 +113,5 @@ class SubjectController extends Controller
         return redirect()->back()->with('success', 'Subject deleted successfully');
     }
 
-    public function store(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255|unique:subjects,name',
-                'mark' => 'required|numeric|min:0|max:100'
-            ]);
-
-            $subject = Subject::create($validated);
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'subject' => $subject,
-                    'message' => 'Subject added successfully'
-                ]);
-            }
-
-            return redirect()->back()->with('success', 'Subject added successfully');
-
-        } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error adding subject: ' . $e->getMessage()
-                ], 422);
-            }
-
-            return redirect()->back()
-                ->withErrors(['error' => 'Error adding subject'])
-                ->withInput();
-        }
-    }
 
 }

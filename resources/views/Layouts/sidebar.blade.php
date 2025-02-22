@@ -23,39 +23,27 @@
     <nav class="p-4">
         <div class="space-y-2">
             <!-- Dashboard -->
-            <a href="{{ route('dashboard') }}" 
-               class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
-                <i class="fas fa-home w-6"></i>
-                <span>Dashboard</span>
-            </a>
-
+           \
             <!-- Users Management -->
-            <a href="{{ route('dashboard.users') }}" 
+            <a href="{{ route('dashboard.users') }}"
                class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('dashboard.users') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
                 <i class="fas fa-users w-6"></i>
                 <span>Users</span>
             </a>
-
+            <a href="{{ route('dashboard.subject') }}"
+            class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('dashboard.subject') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
+             <i class="fas fa-subjects w-6"></i>
+             <span>Subject</span>
+         </a>
             <!-- Settings -->
-            <a href="{{ route('settings') }}" 
-               class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('settings') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
-                <i class="fas fa-cog w-6"></i>
-                <span>Settings</span>
-            </a>
 
-            <!-- Reports -->
-            <a href="{{ route('reports') }}" 
-               class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('reports') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
-                <i class="fas fa-chart-bar w-6"></i>
-                <span>Reports</span>
-            </a>
         </div>
 
         <!-- Logout Button -->
         <div class="absolute bottom-4 w-56">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" 
+                <button type="submit"
                         class="w-full flex items-center space-x-3 p-3 rounded-lg text-white text-opacity-70 hover:bg-red-500 hover:text-white transition duration-200">
                     <i class="fas fa-sign-out-alt w-6"></i>
                     <span>Logout</span>

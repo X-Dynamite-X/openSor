@@ -33,7 +33,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'redirect' => url('/dashboard')
+                'redirect' => url('/dashboard/users')
             ]);
         }
 
@@ -68,7 +68,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect' => url('/dashboard')
+            'redirect' => url('/dashboard/users')
         ]);
     }
 

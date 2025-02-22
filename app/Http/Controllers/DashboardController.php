@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 if ($nextUser) {
                     return response()->json([
                         'success' => true,
-                        'new_user_html' => view('partials.user-row', ['user' => $nextUser])->render()
+                        'new_user_html' => view('partials.users.user-row', ['user' => $nextUser])->render()
                     ]);
                 }
 
@@ -41,16 +41,16 @@ class DashboardController extends Controller
 
             if ($request->has('search')) {
                 return response()->json([
-                    'html' => view('partials.users-table', ['users' => $users])->render(),
-                    'pagination' => view('partials.pagination', ['users' => $users])->render()
+                    'html' => view('partials.users.users-table', ['users' => $users])->render(),
+                    'pagination' => view('partials.users.pagination', ['users' => $users])->render()
                 ]);
             }
 
-            return view('partials.users-table', ['users' => $users]);
+            return view('partials.users.users-table', ['users' => $users]);
         }
 
         $users = User::paginate(10);
-        return view('dashboard', ['users' => $users]);
+        return view('admin.users', ['users' => $users]);
     }
 
     public function update(Request $request, User $user)

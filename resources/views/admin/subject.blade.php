@@ -1,44 +1,51 @@
 @extends('Layouts.admin')
 @section('content')
- 
-                <!-- Your existing table content goes here -->
-                <div
-                    class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg rounded-lg overflow-hidden border border-white border-opacity-20">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-white divide-opacity-20">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        ID
-                                    </th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Name</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Email</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Role</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Created At</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                        Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white divide-opacity-20" id="usersTableBody">
-                                @include('partials.users-table', ['users' => $users])
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="px-6 py-4" id="pagination">
-                        @include('partials.pagination', ['users' => $users])
-                    </div>
+    <!-- Your existing table content goes here -->
+    <div class="container mx-auto px-6 py-8">
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search Subject..."
+                    class="w-full sm:w-96 pl-10 pr-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div
+            class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg rounded-lg overflow-hidden border border-white border-opacity-20">
+
+            <div
+                class="bg-white bg-opacity-10 backdrop-blur-lg shadow-lg rounded-lg overflow-hidden border border-white border-opacity-20">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white divide-opacity-20">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    ID
+                                </th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Name</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Mark</th>
+
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Created At</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white divide-opacity-20" id="subjectsTableBody">
+                            @include('partials.subjects.subjects-table', ['subjects' => $subjects])
+                        </tbody>
+                    </table>
                 </div>
-       
+                <div class="px-6 py-4" id="pagination">
+                    @include('partials.subjects.pagination', ['subjects' => $subjects])
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -48,17 +55,17 @@
         <div
             class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
             <div class="mt-3">
-                <h3 class="text-xl font-bold text-white mb-4">Edit User</h3>
+                <h3 class="text-xl font-bold text-white mb-4">Edit Subject</h3>
                 <form id="editForm" class="mt-4">
-                    <input type="hidden" id="editUserId">
+                    <input type="hidden" id="editSubjectId">
                     <div class="mb-4">
                         <label class="block text-white text-sm font-medium mb-2">Name</label>
                         <input type="text" id="editName"
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
                     <div class="mb-6">
-                        <label class="block text-white text-sm font-medium mb-2">Email</label>
-                        <input type="email" id="editEmail"
+                        <label class="block text-white text-sm font-medium mb-2">Mark</label>
+                        <input type="number" id="editMark"
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                     </div>
 
@@ -86,7 +93,7 @@
                 <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
                 <h3 class="text-xl font-bold text-white mb-4">Confirm Delete</h3>
                 <div class="mt-2 px-7 py-3">
-                    <p class="text-white text-opacity-80">Are you sure you want to delete this user? This action cannot
+                    <p class="text-white text-opacity-80">Are you sure you want to delete this subject? This action cannot
                         be undone.</p>
                 </div>
                 <div class="flex justify-center space-x-3 mt-4">
@@ -96,7 +103,7 @@
                     </button>
                     <button onclick="confirmDelete()"
                         class="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition duration-200">
-                        Delete User
+                        Delete Subject
                     </button>
                 </div>
             </div>
@@ -109,7 +116,7 @@
         class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
         <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
     </div>
-@endsection("model")
+@endsection("loding")
 
 @section('script')
     <script>
@@ -122,7 +129,6 @@
         function hideLoading() {
             $('#loadingIndicator').addClass('hidden');
         }
-
         $(document).ready(function() {
             $.ajaxSetup({
                 headers: {
@@ -134,19 +140,19 @@
 
             $('#searchInput').on('input', function() {
                 clearTimeout(searchTimer);
-                searchTimer = setTimeout(() => fetchUsers(), 300);
+                searchTimer = setTimeout(() => fetchSubjects(), 300);
             });
 
             // إضافة مستمعي الأحداث لروابط الصفحات عند تحميل الصفحة
             $('#pagination a').on('click', function(e) {
                 e.preventDefault();
-                fetchUsers($(this).attr('href'));
+                fetchSubjects($(this).attr('href'));
             });
         });
 
-        function fetchUsers(page = null) {
+        function fetchSubjects(page = null) {
             const searchTerm = $('#searchInput').val();
-            let url = '{{ route('dashboard.users') }}';
+            let url = '{{ route('dashboard.subject') }}';
 
             if (page) {
                 url = page;
@@ -160,15 +166,15 @@
                     search: searchTerm
                 },
                 success: function(response) {
-                    $('#usersTableBody').html(response.html);
+                    $('#subjectsTableBody').html(response.html);
                     $('#pagination').html(response.pagination);
                     $('#pagination a').on('click', function(e) {
                         e.preventDefault();
-                        fetchUsers($(this).attr('href'));
+                        fetchSubjects($(this).attr('href'));
                     });
                 },
                 error: function(xhr, status, error) {
-                    showAlert('Error loading users', 'error');
+                    showAlert('Error loading subjects', 'error');
                 },
                 complete: function() {
                     hideLoading();
@@ -196,19 +202,16 @@
             }, 3000);
         }
 
-        function openEditModal(user) {
-            // استخدام البيانات من الجدول مباشرة بدلاً من كائن user
+        function openEditModal(subject) {
+            // استخدام البيانات من الجدول مباشرة بدلاً من كائن subject
+            console.log(subject);
 
-            const row = $(`tr[data-user-id="${user.id}"]`);
-            const name = row.find('.user-name').text();
-            const email = row.find('.user-email').text();
-            const isAdmin = row.find('.user-role').text().trim() === 'Admin';
-            $('#editUserId').val(user.id);
-            $('#editName').val(user.name.trim());
-            $('#editEmail').val(user.email.trim());
-            if ($('#editIsAdmin').length) { // إذا كان حقل is_admin موجود
-                $('#editIsAdmin').prop('checked', isAdmin);
-            }
+            const row = $(`tr[data-subject-id="${subject.id}"]`);
+            const name = row.find('.subject-name').text();
+            const mark = row.find('.subject-mark').text();
+            $('#editSubjectId').val(subject.id);
+            $('#editName').val(subject.name.trim());
+            $('#editMark').val(subject.mark);
             $('#editModal').removeClass('hidden');
         }
 
@@ -216,8 +219,8 @@
             $('#editModal').addClass('hidden');
         }
 
-        function openDeleteModal(userId) {
-            currentDeleteId = userId;
+        function openDeleteModal(subjectId) {
+            currentDeleteId = subjectId;
             $('#deleteModal').removeClass('hidden');
         }
 
@@ -229,74 +232,70 @@
         function confirmDelete() {
             if (currentDeleteId) {
                 $.ajax({
-                    url: `/users/${currentDeleteId}`,
+                    url: `/subjects/${currentDeleteId}`,
                     type: 'DELETE',
                     success: function(response) {
                         if (response.success) {
                             // حذف الصف من الجدول
-                            $(`tr[data-user-id="${currentDeleteId}"]`).remove();
+                            $(`tr[data-subject-id="${currentDeleteId}"]`).remove();
 
                             // جلب مستخدم جديد إذا كان هناك المزيد من المستخدمين
                             $.ajax({
-                                url: '{{ route('dashboard.users') }}',
+                                url: '{{ route('dashboard.subject') }}',
                                 type: 'GET',
                                 data: {
-                                    get_next_user: true,
+                                    get_next_subject: true,
                                     current_page: $('.pagination .active span').text()
                                 },
                                 success: function(response) {
-                                    if (response.new_user_html) {
-                                         // $('#usersTableBody').append(response.new_user_html);
-                                        //  fetchUsers();
+                                    if (response.new_subject_html) {
+                                        // $('#subjectsTableBody').append(response.new_subject_html);
+                                        //  fetchSubjects();
                                     }
-                                 }
+                                }
                             });
 
                             // إغلاق نافذة التأكيد
                             closeDeleteModal();
 
                             // إظهار رسالة نجاح
-                            showAlert('User deleted successfully', 'success');
+                            showAlert('Subject deleted successfully', 'success');
                         }
                     },
                     error: function(xhr) {
-                        showAlert('Error deleting user', 'error');
+                        showAlert('Error deleting subject', 'error');
                     }
                 });
             }
         }
-
-
-
-        // إضافة معالج حدث تقديم نموذج التعديل
         $('#editForm').on('submit', function(e) {
             e.preventDefault();
-            const userId = $('#editUserId').val();
+            const subjectId = $('#editSubjectId').val();
 
             $.ajax({
-                url: `/users/${userId}`,
+                url: `/subjects/${subjectId}`,
                 type: 'PUT',
                 data: {
                     name: $('#editName').val(),
-                    email: $('#editEmail').val(),
+                    email: $('#editMark').val(),
                 },
                 success: function(response) {
                     if (response.success) {
                         // تحديث الصف في الجدول مباشرة
-                        const row = $(`tr[data-user-id="${userId}"]`);
-                        row.find('.user-name').text(response.user.name);
-                        row.find('.user-email').text(response.user.email);
+                        const row = $(`tr[data-subject-id="${subjectId}"]`);
+                        row.find('.subject-name').text(response.subject.name);
+                        row.find('.subject-email').text(response.subject.email);
 
                         // إغلاق النافذة المنبثقة
                         closeEditModal();
 
                         // إظهار رسالة نجاح (اختياري)
-                        showAlert('User updated successfully', 'success');
+                        showAlert('Subject updated successfully', 'success');
                     }
                 },
                 error: function(xhr) {
                     // إظهار رسالة خطأ (اختياري)
-                    showAlert('Error updating user', 'error');
+                    showAlert('Error updating subject', 'error');
                 }
             });
         });

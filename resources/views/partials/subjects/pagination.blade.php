@@ -1,0 +1,6 @@
+{{ $subjects->links() }}
+
+
+
+
+

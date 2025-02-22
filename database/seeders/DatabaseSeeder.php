@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Subject;
+
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +22,6 @@ class DatabaseSeeder extends Seeder
             'is_admin' => true,
         ]);
         User::factory(1000)->create();
-
-
+        Subject::factory(1000)->create();
     }
 }

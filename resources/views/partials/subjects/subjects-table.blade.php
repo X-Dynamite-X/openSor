@@ -6,13 +6,17 @@
 
          <td class="px-6 py-4 whitespace-nowrap text-white">
             <div class="flex space-x-2">
+                <button onclick="showSubjectUsers({{ $subject->id }})"
+                        class="p-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition duration-200 transform hover:scale-105">
+                    <i class="fas fa-users"></i>
+                </button>
                 <button onclick="openEditModal({{ json_encode($subject) }})"
                         class="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition duration-200 transform hover:scale-105">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button onclick="openDeleteModal({{ $subject->id }})"
                         class="p-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition duration-200 transform hover:scale-105">
-                    <i class="fas fa-trash-alt"></i>
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         </td>

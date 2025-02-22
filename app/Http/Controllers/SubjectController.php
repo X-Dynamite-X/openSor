@@ -113,5 +113,39 @@ class SubjectController extends Controller
         return redirect()->back()->with('success', 'Subject deleted successfully');
     }
 
+    public function getUsers(Request $request, $subjectId)
+    {
+        try {
+            $subject = Subject::findOrFail($subjectId);
 
+            $query = $subject->users()
+                ->select('users.*', 'subject_user.mark')
+                ->join('subject_user', 'users.id', '=', 'subject_user.user_id');
+
+            if ($request->has('search')) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('users.name', 'like', "%{$searchTerm}%")
+                      ->orWhere('users.email', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            $users = $query->paginate(10);
+
+            $html = view('partials.subjects.subject-users-table', compact('users'))->render();
+            $pagination = view('partials.pagination', ['paginator' => $users])->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'pagination' => $pagination
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading users'
+            ], 500);
+        }
+    }
 }

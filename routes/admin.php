@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SubjectUserController;
 
 
 
@@ -19,4 +20,5 @@ Route::middleware(['auth','role:admin'])->group(function () {
     Route::post('/subject', [SubjectController::class, 'store'])->name('subject.store');
     Route::delete('/subject/{subject}', [SubjectController::class, 'destroy']);
     Route::put('/subject/{subject}', [SubjectController::class, 'update']);
+    Route::get('/subject/{subject}/users', [SubjectUserController::class, 'getSubjectUsers']);
 });

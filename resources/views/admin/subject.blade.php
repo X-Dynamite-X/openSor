@@ -59,12 +59,14 @@
 @section('model')
     <!-- Add Subject Modal -->
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
+        <div
+            class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
             <div class="mt-3">
                 <h3 class="text-xl font-bold text-white mb-4">Add New Subject</h3>
 
                 <!-- Error Container -->
-                <div id="addSubjectErrors" class="hidden mb-4 p-4 rounded-lg bg-red-500 bg-opacity-20 border border-red-500 text-red-100">
+                <div id="addSubjectErrors"
+                    class="hidden mb-4 p-4 rounded-lg bg-red-500 bg-opacity-20 border border-red-500 text-red-100">
                     <ul class="list-disc list-inside text-sm"></ul>
                 </div>
 
@@ -101,12 +103,14 @@
     </div>
     <!-- Edit Modal -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
+        <div
+            class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
             <div class="mt-3">
                 <h3 class="text-xl font-bold text-white mb-4">Edit Subject</h3>
 
                 <!-- Error Container -->
-                <div id="editSubjectErrors" class="hidden mb-4 p-4 rounded-lg bg-red-500 bg-opacity-20 border border-red-500 text-red-100">
+                <div id="editSubjectErrors"
+                    class="hidden mb-4 p-4 rounded-lg bg-red-500 bg-opacity-20 border border-red-500 text-red-100">
                     <ul class="list-disc list-inside text-sm"></ul>
                 </div>
 
@@ -169,6 +173,52 @@
             </div>
         </div>
     </div>
+
+    <!-- Users Modal -->
+    <div id="usersModal"
+        class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
+        <div
+            class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">Registered Users</h3>
+                    <button onclick="closeUsersModal()" class="text-white hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <div class="mb-4 relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="userSearchInput" placeholder="Search users..."
+                            class="w-full pl-10 pr-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <table class="min-w-full divide-y divide-white divide-opacity-20">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                    Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                    Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                    Mark</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectUsersTableBody" class="divide-y divide-white divide-opacity-20">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                    <!-- Pagination Container -->
+                    <div id="subjectUsersPagination" class="mt-4 flex justify-center">
+                        <!-- Pagination links will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection("model")
 @section('loding')
     <!-- Loading Indicator -->
@@ -181,6 +231,7 @@
 @section('script')
     <script>
         let currentDeleteId = null;
+        let currentSubjectId = null;
 
         function showLoading() {
             $('#loadingIndicator').removeClass('hidden');
@@ -609,5 +660,164 @@
             errorSpan.addClass('hidden');
             $(this).removeClass('border-red-500');
         });
+
+        function showSubjectUsers(subjectId, page = 1) {
+            currentSubjectId = subjectId;
+            $('#usersModal').removeClass('hidden');
+            // showLoading();
+
+            fetchSubjectUsers(subjectId, page);
+        }
+
+        function fetchSubjectUsers(subjectId, page = 1) {
+            const searchTerm = $('#userSearchInput').val();
+            // showLoading();
+
+            $.ajax({
+                url: `/subject/${subjectId}/users`,
+                type: 'GET',
+                data: {
+                    page: page,
+                    search: searchTerm
+
+                },
+                success: function(response) {
+                    if (response.success) {
+                        renderSubjectUsers(response.users.data);
+                        renderSubjectUsersPagination(response.users);
+                    }
+                },
+                error: function() {
+                    showAlert('Error loading users', 'error');
+                },
+                complete: function() {
+                    hideLoading();
+                }
+            });
+        }
+
+
+
+        function renderSubjectUsers(users) {
+            const tbody = $('#subjectUsersTableBody');
+            tbody.empty();
+
+            users.forEach(user => {
+                tbody.append(`
+                    <tr class="hover:bg-white hover:bg-opacity-5">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.email}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.pivot.mark}</td>
+                    </tr>
+                `);
+            });
+        }
+
+        function renderSubjectUsersPagination(usersData) {
+            const paginationContainer = $('#subjectUsersPagination');
+            paginationContainer.empty();
+
+            if (usersData.total <= usersData.per_page) return;
+
+            let paginationHtml =
+                '<nav role="navigation" aria-label="Pagination Navigation" class="flex items-center justify-between">';
+
+            // Previous page link
+            paginationHtml += `
+                <div class="flex justify-between flex-1 sm:hidden">
+                    <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page - 1})"
+                        class="${usersData.current_page === 1 ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-white bg-opacity-10 border border-white border-opacity-20 rounded-md hover:bg-white hover:bg-opacity-20"
+                        ${usersData.current_page === 1 ? 'disabled' : ''}>
+                        Previous
+                    </button>
+                    <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page + 1})"
+                        class="${usersData.current_page === usersData.last_page ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-white bg-white bg-opacity-10 border border-white border-opacity-20 rounded-md hover:bg-white hover:bg-opacity-20"
+                        ${usersData.current_page === usersData.last_page ? 'disabled' : ''}>
+                        Next
+                    </button>
+                </div>`;
+
+            // Desktop pagination
+            paginationHtml += `
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-white">
+                            Showing
+                            <span class="font-medium">${(usersData.current_page - 1) * usersData.per_page + 1}</span>
+                            to
+                            <span class="font-medium">${Math.min(usersData.current_page * usersData.per_page, usersData.total)}</span>
+                            of
+                            <span class="font-medium">${usersData.total}</span>
+                            results
+                        </p>
+                    </div>
+                    <div>
+                        <span class="relative z-0 inline-flex shadow-sm rounded-md">`;
+
+            // Previous page button
+            paginationHtml += `
+                <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page - 1})"
+                    class="${usersData.current_page === 1 ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-2 py-2 rounded-l-md border border-white border-opacity-20 bg-white bg-opacity-10 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20"
+                    ${usersData.current_page === 1 ? 'disabled' : ''}>
+                <span class="sr-only">Previous</span>
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            </button>`;
+
+            // Page numbers
+            for (let i = 1; i <= usersData.last_page; i++) {
+                if (
+                    i === 1 ||
+                    i === usersData.last_page ||
+                    (i >= usersData.current_page - 2 && i <= usersData.current_page + 2)
+                ) {
+                    paginationHtml += `
+                        <button onclick="fetchSubjectUsers(${currentSubjectId}, ${i})"
+                            class="relative inline-flex items-center px-4 py-2 border border-white border-opacity-20 ${
+                                i === usersData.current_page
+                                    ? 'bg-white bg-opacity-20 text-white'
+                                    : 'bg-white bg-opacity-10 text-white hover:bg-white hover:bg-opacity-20'
+                            } text-sm font-medium">
+                            ${i}
+                        </button>`;
+                } else if (
+                    i === usersData.current_page - 3 ||
+                    i === usersData.current_page + 3
+                ) {
+                    paginationHtml += `
+                        <span class="relative inline-flex items-center px-4 py-2 border border-white border-opacity-20 bg-white bg-opacity-10 text-white text-sm font-medium">
+                            ...
+                        </span>`;
+                }
+            }
+
+            // Next page button
+            paginationHtml += `
+                <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page + 1})"
+                    class="${usersData.current_page === usersData.last_page ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-2 py-2 rounded-r-md border border-white border-opacity-20 bg-white bg-opacity-10 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20"
+                    ${usersData.current_page === usersData.last_page ? 'disabled' : ''}>
+                    <span class="sr-only">Next</span>
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>`;
+
+            paginationHtml += `
+                    </span>
+                </div>
+            </div>
+        </nav>`;
+
+            paginationContainer.html(paginationHtml);
+        }
+
+        function closeUsersModal() {
+            $('#usersModal').addClass('hidden');
+            $('#subjectUsersTableBody').empty();
+            $('#subjectUsersPagination').empty();
+            currentSubjectId = null;
+        }
     </script>
 @endsection("script")

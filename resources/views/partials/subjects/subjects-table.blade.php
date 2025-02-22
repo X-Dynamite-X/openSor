@@ -2,7 +2,9 @@
     <tr class="hover:bg-white hover:bg-opacity-5 transition-colors duration-200" data-subject-id="{{ $subject->id }}">
         <td class="px-6 py-4 whitespace-nowrap text-white subject-id">{{ $subject->id }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-white subject-name">{{ $subject->name }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-white subject-mark">{{ $subject->mark }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-white subject-success_mark">{{ $subject->success_mark }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-white subject-full_mark">{{ $subject->full_mark }}</td>
+
 
          <td class="px-6 py-4 whitespace-nowrap text-white">
             <div class="flex space-x-2">

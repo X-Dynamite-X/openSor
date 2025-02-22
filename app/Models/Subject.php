@@ -12,12 +12,12 @@ class Subject extends Model
 
     protected $fillable = [
         'name',
-        'mark',
-
+        'success_mark',
+        'full_mark'
     ];
     public function users()
     {
         return $this->belongsToMany(User::class, 'subject_users')->withPivot('mark');
     }
-    
+
 }

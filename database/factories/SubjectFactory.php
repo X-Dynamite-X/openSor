@@ -18,8 +18,8 @@ class SubjectFactory extends Factory
     {
         return [
             'name' => fake()->word(),
-            'mark' => fake()->numberBetween(0, 100),
-
+            'success_mark' => 50,
+            'full_mark' => 100,
         ];
     }
 }

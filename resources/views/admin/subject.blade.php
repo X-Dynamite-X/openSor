@@ -35,8 +35,9 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Name</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                    Mark</th>
-
+                                    Success Mark</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                       Full Mark</th>
 
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Actions</th>
@@ -80,13 +81,20 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-white text-sm font-medium mb-2">Mark</label>
-                        <input type="number" id="addMark" required min="0" max="100"
+                        <label class="block text-white text-sm font-medium mb-2">Success Mark</label>
+                        <input type="number" id="addSuccessMark" required min="0" max="100"
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         <!-- Field Error Message -->
-                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="mark"></span>
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="success_mark"></span>
                     </div>
 
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-medium mb-2">Full Mark</label>
+                        <input type="number" id="addFullMark" required min="0" max="100"
+                            class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <!-- Field Error Message -->
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="full_mark"></span>
+                    </div>
                     <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeAddModal()"
                             class="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition duration-200">
@@ -126,11 +134,18 @@
                     </div>
 
                     <div class="mb-6">
-                        <label class="block text-white text-sm font-medium mb-2">Mark</label>
-                        <input type="number" id="editMark"
+                        <label class="block text-white text-sm font-medium mb-2">Success Mark</label>
+                        <input type="number" id="editSuccessMark"
                             class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                         <!-- Field Error Message -->
-                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="mark"></span>
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="success_mark"></span>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-medium mb-2">Full Mark</label>
+                        <input type="number" id="editFullMark"
+                            class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <!-- Field Error Message -->
+                        <span class="error-message text-red-400 text-xs mt-1 hidden" data-for="full_mark"></span>
                     </div>
 
                     <div class="flex justify-end space-x-3">
@@ -318,7 +333,9 @@
 
             $('#editSubjectId').val(subject.id);
             $('#editName').val(subject.name.trim());
-            $('#editMark').val(subject.mark);
+            $('#editSuccessMark').val(subject.success_mark);
+            $('#editFullMark').val(subject.full_mark);
+
             $('#editModal').removeClass('hidden');
         }
 
@@ -345,14 +362,18 @@
                 type: 'PUT',
                 data: {
                     name: $('#editName').val(),
-                    mark: $('#editMark').val(),
+                    success_mark: $('#editSuccessMark').val(),
+                    full_mark: $('#editFullMark').val(),
+
                 },
                 success: function(response) {
                     if (response.success) {
                         // تحديث الصف في الجدول مباشرة
                         const row = $(`tr[data-subject-id="${subjectId}"]`);
                         row.find('.subject-name').text(response.subject.name);
-                        row.find('.subject-mark').text(response.subject.mark);
+                        row.find('.subject-success_mark').text(response.subject.success_mark);
+                        row.find('.subject-full_mark').text(response.subject.full_mark);
+
 
                         // إغلاق النافذة المنبثقة
                         closeEditModal();
@@ -514,7 +535,9 @@
                 type: 'POST',
                 data: {
                     name: $('#addName').val(),
-                    mark: $('#addMark').val(),
+                    success_mark: $('#addSuccessMark').val(),
+                    full_mark: $('#addFullMark').val(),
+
                 },
                 success: function(response) {
                     if (response.success) {
@@ -544,7 +567,7 @@
         });
 
         // التحقق من المدخلات أثناء الكتابة
-        $('#addName, #addMark').on('input', function() {
+        $('#addName, #addSuccessMark, #addFullMark').on('input', function() {
             const field = $(this).attr('id').replace('add', '').toLowerCase();
             const errorSpan = $(`#addForm .error-message[data-for="${field}"]`);
 
@@ -591,7 +614,9 @@
 
             $('#editSubjectId').val(subject.id);
             $('#editName').val(subject.name.trim());
-            $('#editMark').val(subject.mark);
+            $('#editSuccessMark').val(subject.success_mark);
+            $('#editFullMark').val(subject.full_mark);
+
             $('#editModal').removeClass('hidden');
         }
 
@@ -618,7 +643,9 @@
                 type: 'PUT',
                 data: {
                     name: $('#editName').val(),
-                    mark: $('#editMark').val(),
+                    success_mark: $('#editSuccessMark').val(),
+                    full_mark: $('#editFullMark').val(),
+
                 },
                 success: function(response) {
                     if (response.success) {
@@ -652,7 +679,7 @@
         });
 
         // التحقق من المدخلات أثناء الكتابة
-        $('#editName, #editMark').on('input', function() {
+        $('#editName,#editSuccessMark, #editFullMark').on('input', function() {
             const field = $(this).attr('id').replace('edit', '').toLowerCase();
             const errorSpan = $(`#editForm .error-message[data-for="${field}"]`);
 

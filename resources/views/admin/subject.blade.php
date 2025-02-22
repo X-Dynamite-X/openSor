@@ -668,23 +668,33 @@
 
             fetchSubjectUsers(subjectId, page);
         }
+        let searchTimer;
+
+        $('#userSearchInput').on('input', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => fetchSubjectUsers(currentSubjectId), 300);
+        });
 
         function fetchSubjectUsers(subjectId, page = 1) {
             const searchTerm = $('#userSearchInput').val();
-            // showLoading();
+
+
+            showLoading();
 
             $.ajax({
                 url: `/subject/${subjectId}/users`,
                 type: 'GET',
                 data: {
+                    subject_id: subjectId,
                     page: page,
                     search: searchTerm
-
                 },
                 success: function(response) {
                     if (response.success) {
                         renderSubjectUsers(response.users.data);
                         renderSubjectUsersPagination(response.users);
+                    } else {
+                        showAlert('Failed to load users', 'error');
                     }
                 },
                 error: function() {
@@ -817,6 +827,7 @@
             $('#usersModal').addClass('hidden');
             $('#subjectUsersTableBody').empty();
             $('#subjectUsersPagination').empty();
+            $('#userSearchInput').val('');
             currentSubjectId = null;
         }
     </script>

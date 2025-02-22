@@ -20,5 +20,5 @@ Route::middleware(['auth','role:admin'])->group(function () {
     Route::post('/subject', [SubjectController::class, 'store'])->name('subject.store');
     Route::delete('/subject/{subject}', [SubjectController::class, 'destroy']);
     Route::put('/subject/{subject}', [SubjectController::class, 'update']);
-    Route::get('/subject/{subject}/users', [SubjectUserController::class, 'getSubjectUsers']);
+    Route::get('/subject/{subject}/users', [SubjectUserController::class, 'getSubjectUsers'])->name ('subject.users');
 });

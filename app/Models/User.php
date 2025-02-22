@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -45,4 +46,20 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            if ($user->id !== 1) {
+
+                $user->assignRole('user');
+                $user->syncPermissions("not_active");
+            }
+        });
+    }
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');
+    }
+
+
 }

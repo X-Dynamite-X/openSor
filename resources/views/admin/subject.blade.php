@@ -2,13 +2,21 @@
 @section('content')
     <!-- Your existing table content goes here -->
     <div class="container mx-auto px-6 py-8">
-        <!-- Search Bar -->
-        <div class="mb-6">
+        <!-- Header with Add Button -->
+        <div class="flex justify-between items-center mb-6">
+            <!-- Search Bar -->
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 <input type="text" id="searchInput" placeholder="Search Subject..."
                     class="w-full sm:w-96 pl-10 pr-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 backdrop-blur-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
             </div>
+
+            <!-- Add Subject Button -->
+            <button onclick="openAddModal()"
+                class="flex items-center space-x-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-lg text-white transition duration-200 transform hover:scale-105">
+                <i class="fas fa-plus"></i>
+                <span>Add Subject</span>
+            </button>
         </div>
 
         <!-- Content Area -->
@@ -29,8 +37,7 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Mark</th>
 
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                    Created At</th>
+
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Actions</th>
                             </tr>
@@ -109,6 +116,39 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Subject Modal -->
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
+            <div class="mt-3">
+                <h3 class="text-xl font-bold text-white mb-4">Add New Subject</h3>
+                <form id="addForm" class="mt-4">
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-medium mb-2">Name</label>
+                        <input type="text" id="addName" required
+                            class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-medium mb-2">Mark</label>
+                        <input type="number" id="addMark" required min="0" max="100"
+                            class="w-full px-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeAddModal()"
+                            class="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition duration-200">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white transition duration-200">
+                            Add Subject
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection("model")
 @section('loding')
     <!-- Loading Indicator -->
@@ -219,6 +259,38 @@
             $('#editModal').addClass('hidden');
         }
 
+        $('#editForm').on('submit', function(e) {
+            e.preventDefault();
+            const subjectId = $('#editSubjectId').val();
+
+            $.ajax({
+                url: `/subject/${subjectId}`,
+                type: 'PUT',
+                data: {
+                    name: $('#editName').val(),
+                    mark: $('#editMark').val(),
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // تحديث الصف في الجدول مباشرة
+                        const row = $(`tr[data-subject-id="${subjectId}"]`);
+                        row.find('.subject-name').text(response.subject.name);
+                        row.find('.subject-mark').text(response.subject.mark);
+
+                        // إغلاق النافذة المنبثقة
+                        closeEditModal();
+
+                        // إظهار رسالة نجاح (اختياري)
+                        showAlert('Subject updated successfully', 'success');
+                    }
+                },
+                error: function(xhr) {
+                    // إظهار رسالة خطأ (اختياري)
+                    showAlert('Error updating subject', 'error');
+                }
+            });
+        });
+
         function openDeleteModal(subjectId) {
             currentDeleteId = subjectId;
             $('#deleteModal').removeClass('hidden');
@@ -232,7 +304,7 @@
         function confirmDelete() {
             if (currentDeleteId) {
                 $.ajax({
-                    url: `/subjects/${currentDeleteId}`,
+                    url: `/subject/${currentDeleteId}`,
                     type: 'DELETE',
                     success: function(response) {
                         if (response.success) {
@@ -268,37 +340,6 @@
                 });
             }
         }
-        $('#editForm').on('submit', function(e) {
-            e.preventDefault();
-            const subjectId = $('#editSubjectId').val();
-
-            $.ajax({
-                url: `/subjects/${subjectId}`,
-                type: 'PUT',
-                data: {
-                    name: $('#editName').val(),
-                    email: $('#editMark').val(),
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // تحديث الصف في الجدول مباشرة
-                        const row = $(`tr[data-subject-id="${subjectId}"]`);
-                        row.find('.subject-name').text(response.subject.name);
-                        row.find('.subject-email').text(response.subject.email);
-
-                        // إغلاق النافذة المنبثقة
-                        closeEditModal();
-
-                        // إظهار رسالة نجاح (اختياري)
-                        showAlert('Subject updated successfully', 'success');
-                    }
-                },
-                error: function(xhr) {
-                    // إظهار رسالة خطأ (اختياري)
-                    showAlert('Error updating subject', 'error');
-                }
-            });
-        });
 
         // دالة مساعدة لإظهار التنبيهات (اختياري)
         function showAlert(message, type = 'success') {
@@ -319,5 +360,43 @@
                 });
             }, 3000);
         }
+
+        function openAddModal() {
+            $('#addModal').removeClass('hidden');
+            $('#addName').val('');
+            $('#addMark').val('');
+        }
+
+        function closeAddModal() {
+            $('#addModal').addClass('hidden');
+        }
+
+        $('#addForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '/subject',
+                type: 'POST',
+                data: {
+                    name: $('#addName').val(),
+                    mark: $('#addMark').val(),
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Refresh the table
+                        fetchSubjects();
+
+                        // Close modal
+                        closeAddModal();
+
+                        // Show success message
+                        showAlert('Subject added successfully', 'success');
+                    }
+                },
+                error: function(xhr) {
+                    showAlert('Error adding subject', 'error');
+                }
+            });
+        });
     </script>
 @endsection("script")

@@ -15,4 +15,9 @@ class Subject extends Model
         'mark',
 
     ];
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'subject_users')->withPivot('mark');
+    }
+    
 }

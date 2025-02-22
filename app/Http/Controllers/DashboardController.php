@@ -4,20 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = User::query();
+            $query = User::query()
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('name', 'admin');
+                });
 
             if ($request->has('search')) {
                 $searchTerm = $request->search;
-                $query->where(function($q) use ($searchTerm) {
-                    $q->where('name', 'like', "%{$searchTerm}%")
-                      ->orWhere('email', 'like', "%{$searchTerm}%");
-                });
+                $query->whereAny(['name', 'email'], 'like', "%{$searchTerm}%");
             }
 
             // إذا كان الطلب للحصول على مستخدم جديد بعد الحذف
@@ -37,7 +39,12 @@ class DashboardController extends Controller
                 return response()->json(['success' => true]);
             }
 
-            $users = $query->paginate(10);
+            $users = $query->with([
+                'roles:id,name',
+                'permissions:id,name'
+            ])
+                ->select(['id', 'name', 'email', 'created_at'])
+                ->paginate(10);
 
             if ($request->has('search')) {
                 return response()->json([
@@ -49,19 +56,72 @@ class DashboardController extends Controller
             return view('partials.users.users-table', ['users' => $users]);
         }
 
-        $users = User::paginate(10);
+        // للطلبات غير Ajax
+        $users = User::whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'admin');
+        })
+            ->with([
+                'roles:id,name',
+                'permissions:name'
+            ])
+            ->select(['id', 'name', 'email', 'created_at'])
+            ->paginate(10);
+
         return view('admin.users', ['users' => $users]);
     }
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:6',
+                'is_active' => 'required|in:active,not_active',
+            ]);
 
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+            ]);
+
+            // Set permissions based on active status
+
+            $user->givePermissionTo($validated['is_active']);
+
+
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'user' => $user,
+                    'message' => 'User added successfully'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'User added successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error adding user: ' . $e->getMessage()
+                ], 422);
+            }
+
+            return redirect()->back()
+                ->withErrors(['error' => 'Error adding user'])
+                ->withInput();
+        }
+    }
     public function update(Request $request, User $user)
     {
         $validated = $request->validate(rules: [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
         ]);
-
+        $user->syncPermissions($request->is_active);
         $user->update($validated);
-
+        $user->save();
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,

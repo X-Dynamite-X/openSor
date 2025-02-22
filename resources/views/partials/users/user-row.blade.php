@@ -8,14 +8,16 @@
     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 user-email">
         {{ $user->email }}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-        @if($user->is_admin)
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-700 dark:text-green-300">
-                Admin
+    <td class="px-6 py-4 whitespace-nowrap user-status">
+        @if($user->permissions[0]->name === 'active')
+            <span class="px-3 py-1 inline-flex items-center justify-center text-xs leading-5 font-semibold rounded-full bg-green-100 bg-opacity-20 text-green-400 border border-green-400 border-opacity-20">
+                <i class="fas fa-check-circle mr-1"></i>
+                Active
             </span>
         @else
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                User
+            <span class="px-3 py-1 inline-flex items-center justify-center text-xs leading-5 font-semibold rounded-full bg-red-100 bg-opacity-20 text-red-400 border border-red-400 border-opacity-20">
+                <i class="fas fa-times-circle mr-1"></i>
+                Not Active
             </span>
         @endif
     </td>

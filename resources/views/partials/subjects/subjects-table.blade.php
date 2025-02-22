@@ -4,8 +4,7 @@
         <td class="px-6 py-4 whitespace-nowrap text-white subject-name">{{ $subject->name }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-white subject-mark">{{ $subject->mark }}</td>
 
-        <td class="px-6 py-4 whitespace-nowrap text-white">{{ $subject->created_at->format('Y-m-d') }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-white">
+         <td class="px-6 py-4 whitespace-nowrap text-white">
             <div class="flex space-x-2">
                 <button onclick="openEditModal({{ json_encode($subject) }})"
                         class="p-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition duration-200 transform hover:scale-105">

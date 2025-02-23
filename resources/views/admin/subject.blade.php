@@ -36,8 +36,8 @@
                                     Name</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Success Mark</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                       Full Mark</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Full Mark</th>
 
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Actions</th>
@@ -705,35 +705,78 @@
         function fetchSubjectUsers(subjectId, page = 1) {
             const searchTerm = $('#userSearchInput').val();
 
-
             showLoading();
+            $('#subjectUsersTableBody').empty();
+            $('#subjectUsersPagination').empty();
 
             $.ajax({
                 url: `/subject/${subjectId}/users`,
                 type: 'GET',
                 data: {
-                    subject_id: subjectId,
                     page: page,
                     search: searchTerm
                 },
                 success: function(response) {
                     if (response.success) {
-                        renderSubjectUsers(response.users.data);
-                        renderSubjectUsersPagination(response.users);
+                        renderSubjectUsers(response.data.users);
+
+                        if (response.data.pagination) {
+                            $('#subjectUsersPagination').html(response.data.pagination);
+
+                            // تحسين طريقة الحصول على رقم الصفحة
+                            $('#subjectUsersPagination').find('a').on('click', function(e) {
+                                e.preventDefault();
+                                const href = $(this).attr('href');
+                                const pageNum = href ? new URLSearchParams(href.split('?')[1]).get(
+                                    'page') : 1;
+
+                                if (pageNum) {
+                                    fetchSubjectUsers(subjectId, parseInt(pageNum));
+                                }
+                            });
+                        }
                     } else {
-                        showAlert('Failed to load users', 'error');
+                        showAlert(response.message || 'Failed to load users', 'error');
                     }
                 },
-                error: function() {
-                    showAlert('Error loading users', 'error');
+                error: function(xhr) {
+                    const errorMessage = xhr.responseJSON?.message || 'Error loading users';
+                    showAlert(errorMessage, 'error');
+
+                    $('#subjectUsersTableBody').html(`
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-white">
+                        <div class="flex flex-col items-center justify-center space-y-2">
+                            <i class="fas fa-exclamation-circle text-4xl text-red-400"></i>
+                            <p class="text-white text-opacity-60">${errorMessage}</p>
+                        </div>
+                    </td>
+                </tr>
+            `);
                 },
                 complete: function() {
                     hideLoading();
                 }
             });
         }
+        // دالة مساعدة لعرض حالة التحميل
+        function showLoading() {
+            $('#subjectUsersTableBody').html(`
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-white">
+                        <div class="flex flex-col items-center justify-center space-y-2">
+                            <i class="fas fa-spinner fa-spin text-4xl text-white text-opacity-40"></i>
+                            <p class="text-white text-opacity-60">Loading users...</p>
+                        </div>
+                    </td>
+                </tr>
+            `);
+        }
 
-
+        // دالة مساعدة لإخفاء حالة التحميل
+        function hideLoading() {
+            // يتم التعامل مع هذا تلقائياً عند تحديث محتوى الجدول
+        }
 
         function renderSubjectUsers(users) {
             const tbody = $('#subjectUsersTableBody');

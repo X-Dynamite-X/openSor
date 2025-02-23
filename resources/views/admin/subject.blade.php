@@ -220,6 +220,8 @@
                                     Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                     Mark</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                        Action</th>
                             </tr>
                         </thead>
                         <tbody id="subjectUsersTableBody" class="divide-y divide-white divide-opacity-20">
@@ -230,6 +232,84 @@
                     <div id="subjectUsersPagination" class="mt-4 flex justify-center">
                         <!-- Pagination links will be loaded here -->
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Mark Modal -->
+    <div id="editMarkModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-gradient-to-b from-gray-800 to-gray-900 border-gray-700">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-white">Edit Student Mark</h3>
+                    <button onclick="closeEditMarkModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editMarkForm" class="space-y-4">
+                    <input type="hidden" id="editMarkUserId">
+                    <div>
+                        <label class="block text-gray-300 text-sm font-medium mb-2">Student Name</label>
+                        <div id="editMarkUserName" class="bg-gray-700 bg-opacity-50 rounded-lg px-4 py-2.5 text-white"></div>
+                    </div>
+                    <div>
+                        <label for="editMarkValue" class="block text-gray-300 text-sm font-medium mb-2">Mark</label>
+                        <input type="number" id="editMarkValue"
+                            class="w-full px-4 py-2.5 rounded-lg border border-gray-600 bg-gray-700 bg-opacity-50 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            min="0" max="100" placeholder="Enter mark (0-100)">
+                        <span class="error-message text-red-400 text-sm mt-1 hidden" data-for="mark"></span>
+                    </div>
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button type="button" onclick="closeEditMarkModal()"
+                            class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition duration-200">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition duration-200 flex items-center">
+                            <i class="fas fa-save mr-2"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove User Modal -->
+    <div id="removeUserModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-gradient-to-b from-gray-800 to-gray-900 border-gray-700">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-white">Remove Student</h3>
+                    <button onclick="closeRemoveUserModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <input type="hidden" id="removeUserId">
+                <div class="mb-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="bg-red-500 bg-opacity-20 rounded-full p-3">
+                            <i class="fas fa-user-minus text-3xl text-red-500"></i>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-300">
+                        Are you sure you want to remove
+                        <span id="removeUserName" class="font-semibold text-white"></span>
+                        from this subject?
+                    </p>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeRemoveUserModal()"
+                        class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition duration-200">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </button>
+                    <button id="confirmRemoveBtn" onclick="confirmRemoveUser()"
+                        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition duration-200 flex items-center">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -247,6 +327,8 @@
     <script>
         let currentDeleteId = null;
         let currentSubjectId = null;
+        let editMarkUserId = null;
+        let removeUserId = null;
 
         function showLoading() {
             $('#loadingIndicator').removeClass('hidden');
@@ -775,7 +857,7 @@
 
         // دالة مساعدة لإخفاء حالة التحميل
         function hideLoading() {
-            // يتم التعامل مع هذا تلقائياً عند تحديث محتوى الجدول
+            // يتم التعامل مع هذا تلقائ��
         }
 
         function renderSubjectUsers(users) {
@@ -784,11 +866,23 @@
 
             users.forEach(user => {
                 tbody.append(`
-                    <tr class="hover:bg-white hover:bg-opacity-5">
+                    <tr class="hover:bg-white hover:bg-opacity-5" id="userId_${user.id}" >
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.id}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.name}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.email}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${user.pivot.mark}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white" id="userMark_${user.id}" >${user.pivot.mark}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                            <div class="flex space-x-2">
+                                <button onclick="editUserMark(${user.id}, '${user.name}', ${user.pivot.mark})"
+                                    class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Edit Mark
+                                </button>
+                                <button onclick="removeUserFromSubject(${user.id}, '${user.name}')"
+                                    class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                    Remove
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `);
             });
@@ -899,6 +993,131 @@
             $('#subjectUsersPagination').empty();
             $('#userSearchInput').val('');
             currentSubjectId = null;
+        }
+
+        function editUserMark(userId, userName, currentMark) {
+            $('#editMarkUserId').val(userId);
+            $('#editMarkUserName').text(userName);
+            $('#editMarkValue').val(currentMark || '');
+            $('#editMarkModal').removeClass('hidden');
+        }
+
+        function closeEditMarkModal() {
+            $('#editMarkModal').addClass('hidden');
+            $('#editMarkForm')[0].reset();
+            $('.error-message').addClass('hidden');
+        }
+
+        $('#editMarkForm').on('submit', function(e) {
+            e.preventDefault();
+            const userId = $('#editMarkUserId').val();
+            const mark = $('#editMarkValue').val();
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalContent = submitBtn.html();
+
+            // التحقق من صحة القيمة
+            if (mark === '' || isNaN(mark) || mark < 0 || mark > 100) {
+                $('.error-message[data-for="mark"]')
+                    .text('Please enter a valid mark between 0 and 100')
+                    .removeClass('hidden');
+                return;
+            }
+
+            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...').prop('disabled', true);
+
+            $.ajax({
+                url: `/admin/subject/${currentSubjectId}/users/${userId}/mark`,
+                type: 'PUT',
+                data: { mark: mark },
+                success: function(response) {
+                    if (response.success) {
+                        closeEditMarkModal();
+                        showAlert('Mark updated successfully', 'success');
+                         $('#userMark_' + userId).text(mark);
+
+                        refreshUsersList();
+                    }
+                },
+                error: function(xhr) {
+                    const response = xhr.responseJSON;
+                    if (response.errors) {
+                        Object.keys(response.errors).forEach(key => {
+                            $('.error-message[data-for="mark"]')
+                                .text(response.errors[key][0])
+                                .removeClass('hidden');
+                        });
+                    }
+                },
+                complete: function() {
+                    submitBtn.html(originalContent).prop('disabled', false);
+                }
+            });
+        });
+
+        // إضافة مستمع للإدخال لإخفاء رسالة الخطأ عند الكتابة
+        $('#editMarkValue').on('input', function() {
+            $('.error-message[data-for="mark"]').addClass('hidden');
+        });
+
+        function removeUserFromSubject(userId, userName) {
+            $('#removeUserModal').removeClass('hidden');
+            $('#removeUserName').text(userName);
+            $('#removeUserId').val(userId);
+        }
+
+        function confirmRemoveUser() {
+            const userId = $('#removeUserId').val();
+            const submitBtn = $('#confirmRemoveBtn');
+            const originalContent = submitBtn.html();
+
+            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Removing...').prop('disabled', true);
+
+            $.ajax({
+                url: `/admin/subject/${currentSubjectId}/users/${userId}`,
+                type: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        closeRemoveUserModal();
+                        showAlert('User removed successfully', 'success');
+                        $('#userId_' + userId).remove();
+
+                        refreshUsersList();
+                    } else {
+                        showAlert('Error removing user', 'error');
+                    }
+                },
+                error: function() {
+                    showAlert('Error removing user', 'error');
+                },
+                complete: function() {
+                    submitBtn.html(originalContent).prop('disabled', false);
+                }
+            });
+        }
+
+        function refreshUsersList() {
+            const searchTerm = $('#searchInput').val();
+            // loadUsers(searchTerm);
+        }
+
+
+        function closeEditMarkModal() {
+            $('#editMarkModal').addClass('hidden');
+            editMarkUserId = null;
+            $('#editMarkForm')[0].reset();
+            $('.error-message').addClass('hidden');
+        }
+
+
+        function openRemoveUserModal(userId, userName) {
+            removeUserId = userId;
+            $('#removeUserName').text(userName);
+            $('#removeUserModal').removeClass('hidden');
+        }
+
+        function closeRemoveUserModal() {
+            $('#removeUserModal').addClass('hidden');
+            $('#removeUserId').val('');
         }
     </script>
 @endsection("script")

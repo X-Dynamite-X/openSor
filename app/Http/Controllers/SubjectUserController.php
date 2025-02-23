@@ -37,55 +37,38 @@ class SubjectUserController extends Controller
                 'success' => true,
                 'data' => [
                     'users' => $users->items(),
-                    'pagination' => view('partials.subjects.pagination_subject_user', ['paginator' => $users])->render(),
-                    'html' => view('partials.subjects.subject-users-table', compact('users'))->render()
+                    'pagination' => view('partials.subjects.users.pagination_subject_user', ['paginator' => $users])->render(),
+                    'html' => view('partials.subjects.users.subject-users-table', compact('users'))->render()
 
                 ]
             ]);
 
     }
-    // public function getSubjectUsers(Subject $subject, Request $request)
-    // {
-    //     try {
-    //         $query = $subject->users();
+    public function updateMark(Request $request, Subject $subject, $userId)
+    {
+        $validated = $request->validate([
+            'mark' => 'required|numeric|min:0|max:100',
+        ]);
 
-    //         if ($request->filled('search')) {
-    //             $searchTerm = $request->search;
-    //             $query->where(function ($q) use ($searchTerm) {
-    //                 $q->where('name', 'like', "%{$searchTerm}%")
-    //                     ->orWhere('email', 'like', "%{$searchTerm}%");
-    //             });
-    //         }
+        $subject->users()->updateExistingPivot($userId, ['mark' => $validated['mark']]);
 
-    //         $users = $query->select('users.*', 'subject_user.mark')
-    //                       ->paginate(10);
+        return response()->json([
+            'success' => true,
+            'message' => 'Mark updated successfully',
+        ]);
+    }
+    public function removeUser(Subject $subject, $userId)
+    {
+        $subject->users()->detach($userId);
 
-            // if ($users->isEmpty() && $request->filled('search')) {
-            //     return response()->json([
-            //         'success' => true,
-            //         'data' => [
-            //             'users' => [],
-            //             'pagination' => '',
-            //             'html' => view('partials.subjects.empty-search-results')->render()
-            //         ]
-            //     ]);
-            // }
+        return response()->json([
+            'success' => true,
+            'message' => 'User removed successfully',
+        ]);
+    }
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'data' => [
-    //                 'users' => $users->items(),
-    //                 'pagination' => view('partials.users.pagination', ['paginator' => $users])->render(),
-    //                 'html' => view('partials.subjects.subject-users-table', compact('users'))->render()
-    //             ]
-    //         ]);
 
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error loading users: ' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
+
+
 
 }

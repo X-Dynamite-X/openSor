@@ -11,7 +11,7 @@ use App\Http\Controllers\SubjectUserController;
 
 
 
-Route::middleware(['auth','role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/users', [DashboardController::class, 'index'])->name('dashboard.users');
     Route::post('/users', [DashboardController::class, 'store'])->name('users.store');
     Route::delete('/users/{user}', [DashboardController::class, 'destroy']);
@@ -20,5 +20,9 @@ Route::middleware(['auth','role:admin'])->group(function () {
     Route::post('/subject', [SubjectController::class, 'store'])->name('subject.store');
     Route::delete('/subject/{subject}', [SubjectController::class, 'destroy']);
     Route::put('/subject/{subject}', [SubjectController::class, 'update']);
-    Route::get('/subject/{subject}/users', [SubjectUserController::class, 'getSubjectUsers'])->name ('subject.users');
+    Route::get('/subject/{subject}/users', [SubjectUserController::class, 'getSubjectUsers'])->name('subject.users');
+    Route::put('/admin/subject/{subject}/users/{user}/mark', [SubjectUserController::class, 'updateMark'])
+        ->name('subject.user.mark.update');
+    Route::delete('/admin/subject/{subject}/users/{user}', [SubjectUserController::class, 'removeUser'])
+        ->name('subject.user.remove');
 });

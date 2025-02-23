@@ -11,10 +11,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- 
+
 </head>
 
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen">
+<body class= " dark:bg-gradient-to-br from-blue-800 via-cyan-600  to-cyan-800 min-h-screen">
     <div class="flex h-screen">
         <!-- Sidebar -->
         @include('layouts.sidebar')
@@ -27,7 +27,7 @@
             <!-- Page Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-transparent">
 
-                        @yield('content')
+                @yield('content')
 
             </main>
         </div>

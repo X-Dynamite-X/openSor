@@ -1,4 +1,4 @@
-@if(isset($paginator))
-    {{ $paginator->links() }}
+@if(isset($users))
+    {{ $users->links() }}
 @endif
 

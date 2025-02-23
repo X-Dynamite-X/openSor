@@ -25,4 +25,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('subject.user.mark.update');
     Route::delete('/admin/subject/{subject}/users/{user}', [SubjectUserController::class, 'removeUser'])
         ->name('subject.user.remove');
+    Route::get('/subject/{subject}/available-users', [SubjectUserController::class, 'getAvailableUsers']);
+    Route::post('/subject/{subject}/add-users', [SubjectUserController::class, 'addUsers']);
 });

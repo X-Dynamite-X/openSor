@@ -197,9 +197,18 @@
             <div class="mt-3">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-white">Registered Users</h3>
-                    <button onclick="closeUsersModal()" class="text-white hover:text-gray-300">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="flex space-x-3">
+                        <!-- Add New Users Button -->
+                        <button onclick="openAddNewUsersModal()"
+                                class="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition duration-200">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Add New Users
+                        </button>
+                        <!-- Close Modal Button -->
+                        <button onclick="closeUsersModal()" class="text-white hover:text-gray-300">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -309,6 +318,90 @@
                         class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition duration-200 flex items-center">
                         <i class="fas fa-trash-alt mr-2"></i>
                         Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Users Modal -->
+    <div id="addNewUsersModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-3/4 shadow-lg rounded-lg bg-white bg-opacity-10 backdrop-blur-lg border-white border-opacity-20">
+            <div class="mt-3">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">Add New Users to Subject</h3>
+                    <button onclick="closeAddNewUsersModal()" class="text-white hover:text-gray-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Search and Filter Section -->
+                <div class="mb-4">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text"
+                               id="newUserSearchInput"
+                               placeholder="Search users by name or email..."
+                               class="w-full pl-10 pr-4 py-2 rounded-lg border border-white border-opacity-20 bg-white bg-opacity-10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-white divide-opacity-20">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                    <input type="checkbox"
+                                           id="selectAllNewUsers"
+                                           class="rounded border-white border-opacity-20 bg-white bg-opacity-10 text-green-500 focus:ring-green-500 focus:ring-offset-gray-800">
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newUsersTableBody" class="divide-y divide-white divide-opacity-20">
+                            <!-- Users will be loaded here dynamically -->
+                        </tbody>
+                    </table>
+
+                    <!-- Loading State -->
+                    <div id="newUsersLoading" class="hidden py-4 text-center">
+                        <div class="flex items-center justify-center">
+                            <i class="fas fa-spinner fa-spin text-white mr-2"></i>
+                            <span class="text-white">Loading users...</span>
+                        </div>
+                    </div>
+
+                    <!-- No Users Found State -->
+                    <div id="noNewUsersFound" class="hidden py-4 text-center">
+                        <span class="text-white opacity-70">No users found</span>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="newUsersError" class="hidden py-4 text-center">
+                        <span class="text-red-500">Error loading users. Please try again.</span>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="newUsersPagination" class="mt-4 flex justify-center">
+                    <!-- Pagination will be inserted here -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3 mt-4">
+                    <button onclick="closeAddNewUsersModal()"
+                            class="px-4 py-2 rounded-lg bg-gray-500 hover:bg-gray-600 text-white transition duration-200">
+                        Cancel
+                    </button>
+                    <button onclick="addSelectedUsersToSubject()"
+                            id="addSelectedUsersBtn"
+                            class="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white transition duration-200 flex items-center">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Add Selected Users
                     </button>
                 </div>
             </div>
@@ -950,5 +1043,144 @@
             $('#removeUserModal').addClass('hidden');
             $('#removeUserId').val('');
         }
+        function openAddNewUsersModal() {
+    $('#addNewUsersModal').removeClass('hidden');
+    fetchAvailableUsers(); // سنقوم بإنشاء هذه الدالة لجلب المستخدمين المتاحين
+}
+
+function closeAddNewUsersModal() {
+    $('#addNewUsersModal').addClass('hidden');
+    $('#newUserSearchInput').val('');
+    $('#newUsersTableBody').empty();
+    $('#selectAllNewUsers').prop('checked', false);
+}
+
+// إضافة متغير عام لتأخير البحث
+
+// إضافة مستمع حدث للبحث
+$('#newUserSearchInput').on('input', function() {
+    clearTimeout(searchTimer); // إلغاء المؤقت السابق
+    searchTimer = setTimeout(() => {
+        fetchAvailableUsers(1); // إعادة تحميل الصفحة الأولى عند البحث
+    }, 300); // تأخير 300 مللي ثانية
+});
+
+function fetchAvailableUsers(page = 1) {
+    const searchTerm = $('#newUserSearchInput').val().trim();
+    const subjectId = currentSubjectId;
+
+    // إظهار حالة التحميل
+    $('#newUsersTableBody').hide();
+    $('#newUsersLoading').removeClass('hidden');
+    $('#newUsersError').addClass('hidden');
+    $('#noNewUsersFound').addClass('hidden');
+
+    $.ajax({
+        url: `/subject/${subjectId}/available-users`, // تصحيح المسار
+        method: 'GET',
+        data: {
+            search: searchTerm,
+            page: page
+        },
+        success: function(response) {
+            $('#newUsersTableBody').empty();
+
+            if (response.users.length === 0) {
+                $('#noNewUsersFound').removeClass('hidden');
+            } else {
+                response.users.forEach(user => {
+                    const row = `
+                        <tr class="hover:bg-white hover:bg-opacity-5">
+                            <td class="px-6 py-4">
+                                <input type="checkbox"
+                                       value="${user.id}"
+                                       class="user-checkbox rounded border-white border-opacity-20 bg-white bg-opacity-10 text-green-500 focus:ring-green-500">
+                            </td>
+                            <td class="px-6 py-4 text-white">${user.name}</td>
+                            <td class="px-6 py-4 text-white">${user.email}</td>
+                            <td class="px-6 py-4 text-white">
+                                <span class="px-2 py-1 rounded-full ${user.is_active ? 'bg-green-500' : 'bg-red-500'} bg-opacity-20">
+                                    ${user.is_active ? 'Active' : 'Inactive'}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    $('#newUsersTableBody').append(row);
+                });
+            }
+
+            // تحديث الترقيم
+            $('#newUsersPagination').html(response.pagination);
+
+            // إضافة مستمعي أحداث للترقيم
+            $('#newUsersPagination a').on('click', function(e) {
+                e.preventDefault();
+                const pageUrl = $(this).attr('href');
+                const pageNumber = pageUrl.split('page=')[1];
+                fetchAvailableUsers(pageNumber);
+            });
+
+            $('#newUsersTableBody').show();
+        },
+        error: function(xhr) {
+            $('#newUsersError').removeClass('hidden');
+            console.error('Error fetching users:', xhr);
+        },
+        complete: function() {
+            $('#newUsersLoading').addClass('hidden');
+        }
+    });
+}
+
+// التعامل مع زر تحديد الكل
+$('#selectAllNewUsers').on('change', function() {
+    $('.user-checkbox').prop('checked', $(this).is(':checked'));
+});
+
+// إضافة مستمع حدث عند فتح النافذة المنبثقة
+function openAddNewUsersModal() {
+    $('#addNewUsersModal').removeClass('hidden');
+    $('#newUserSearchInput').val(''); // مسح البحث السابق
+    fetchAvailableUsers(1); // تحميل الصفحة الأولى
+}
+
+// التعامل مع البحث
+
+
+// دالة إضافة المستخدمين المحددين
+function addSelectedUsersToSubject() {
+    const selectedUsers = $('.user-checkbox:checked').map(function() {
+        return $(this).val();
+    }).get();
+
+    if (selectedUsers.length === 0) {
+        showAlert('Please select at least one user', 'error');
+        return;
+    }
+
+    const submitBtn = $('#addSelectedUsersBtn');
+    const originalContent = submitBtn.html();
+    submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Adding...').prop('disabled', true);
+
+    $.ajax({
+        url: `/subject/${currentSubjectId}/add-users`,
+        method: 'POST',
+        data: {
+            user_ids: selectedUsers
+        },
+        success: function(response) {
+            showAlert('Users added successfully', 'success');
+            closeAddNewUsersModal();
+            // تحديث جدول المستخدمين الحالي
+            fetchSubjectUsers(currentSubjectId);
+        },
+        error: function(xhr) {
+            showAlert('Error adding users', 'error');
+        },
+        complete: function() {
+            submitBtn.html(originalContent).prop('disabled', false);
+        }
+    });
+}
     </script>
 @endsection("script")

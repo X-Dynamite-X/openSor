@@ -390,25 +390,7 @@
             });
         }
 
-        function showAlert(message, type = 'success') {
-            const alertDiv = $(`
-                <div class="fixed top-4 right-4 px-6 py-3 rounded-lg ${
-                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                } text-white shadow-lg z-50 animate-fade-in-down">
-                    <div class="flex items-center space-x-2">
-                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                </div>
-            `);
 
-            $('body').append(alertDiv);
-            setTimeout(() => {
-                alertDiv.fadeOut(300, function() {
-                    $(this).remove();
-                });
-            }, 3000);
-        }
 
         function openEditModal(subject) {
             resetEditSubjectErrors();
@@ -428,58 +410,6 @@
         }
 
         // معالجة تقديم نموذج التعديل
-        $('#editForm').on('submit', function(e) {
-            e.preventDefault();
-            resetEditSubjectErrors();
-
-            const subjectId = $('#editSubjectId').val();
-            const submitBtn = $(this).find('button[type="submit"]');
-            const originalContent = submitBtn.html();
-
-            // تغيير حالة الزر إلى حالة التحميل
-            submitBtn.html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...').prop('disabled', true);
-
-            $.ajax({
-                url: `/subject/${subjectId}`,
-                type: 'PUT',
-                data: {
-                    name: $('#editName').val(),
-                    success_mark: $('#editSuccessMark').val(),
-                    full_mark: $('#editFullMark').val(),
-
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // تحديث الصف في الجدول مباشرة
-                        const row = $(`tr[data-subject-id="${subjectId}"]`);
-                        row.find('.subject-name').text(response.subject.name);
-                        row.find('.subject-success_mark').text(response.subject.success_mark);
-                        row.find('.subject-full_mark').text(response.subject.full_mark);
-
-
-                        // إغلاق النافذة المنبثقة
-                        closeEditModal();
-
-                        // إظهار رسالة نجاح
-                        showAlert('Subject updated successfully', 'success');
-                    }
-                },
-                error: function(xhr) {
-                    const response = xhr.responseJSON;
-                    if (response.errors) {
-                        displayEditSubjectErrors(response.errors);
-                    } else if (response.message) {
-                        displayEditSubjectErrors(response.message);
-                    } else {
-                        displayEditSubjectErrors('An error occurred while updating the subject');
-                    }
-                },
-                complete: function() {
-                    // إعادة الزر إلى حالته الأصلية
-                    submitBtn.html(originalContent).prop('disabled', false);
-                }
-            });
-        });
 
         function openDeleteModal(subjectId) {
             currentDeleteId = subjectId;
@@ -886,105 +816,6 @@
                     </tr>
                 `);
             });
-        }
-
-        function renderSubjectUsersPagination(usersData) {
-            const paginationContainer = $('#subjectUsersPagination');
-            paginationContainer.empty();
-
-            if (usersData.total <= usersData.per_page) return;
-
-            let paginationHtml =
-                '<nav role="navigation" aria-label="Pagination Navigation" class="flex items-center justify-between">';
-
-            // Previous page link
-            paginationHtml += `
-                <div class="flex justify-between flex-1 sm:hidden">
-                    <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page - 1})"
-                        class="${usersData.current_page === 1 ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-white bg-opacity-10 border border-white border-opacity-20 rounded-md hover:bg-white hover:bg-opacity-20"
-                        ${usersData.current_page === 1 ? 'disabled' : ''}>
-                        Previous
-                    </button>
-                    <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page + 1})"
-                        class="${usersData.current_page === usersData.last_page ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-white bg-white bg-opacity-10 border border-white border-opacity-20 rounded-md hover:bg-white hover:bg-opacity-20"
-                        ${usersData.current_page === usersData.last_page ? 'disabled' : ''}>
-                        Next
-                    </button>
-                </div>`;
-
-            // Desktop pagination
-            paginationHtml += `
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-white">
-                            Showing
-                            <span class="font-medium">${(usersData.current_page - 1) * usersData.per_page + 1}</span>
-                            to
-                            <span class="font-medium">${Math.min(usersData.current_page * usersData.per_page, usersData.total)}</span>
-                            of
-                            <span class="font-medium">${usersData.total}</span>
-                            results
-                        </p>
-                    </div>
-                    <div>
-                        <span class="relative z-0 inline-flex shadow-sm rounded-md">`;
-
-            // Previous page button
-            paginationHtml += `
-                <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page - 1})"
-                    class="${usersData.current_page === 1 ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-2 py-2 rounded-l-md border border-white border-opacity-20 bg-white bg-opacity-10 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20"
-                    ${usersData.current_page === 1 ? 'disabled' : ''}>
-                <span class="sr-only">Previous</span>
-                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-            </button>`;
-
-            // Page numbers
-            for (let i = 1; i <= usersData.last_page; i++) {
-                if (
-                    i === 1 ||
-                    i === usersData.last_page ||
-                    (i >= usersData.current_page - 2 && i <= usersData.current_page + 2)
-                ) {
-                    paginationHtml += `
-                        <button onclick="fetchSubjectUsers(${currentSubjectId}, ${i})"
-                            class="relative inline-flex items-center px-4 py-2 border border-white border-opacity-20 ${
-                                i === usersData.current_page
-                                    ? 'bg-white bg-opacity-20 text-white'
-                                    : 'bg-white bg-opacity-10 text-white hover:bg-white hover:bg-opacity-20'
-                            } text-sm font-medium">
-                            ${i}
-                        </button>`;
-                } else if (
-                    i === usersData.current_page - 3 ||
-                    i === usersData.current_page + 3
-                ) {
-                    paginationHtml += `
-                        <span class="relative inline-flex items-center px-4 py-2 border border-white border-opacity-20 bg-white bg-opacity-10 text-white text-sm font-medium">
-                            ...
-                        </span>`;
-                }
-            }
-
-            // Next page button
-            paginationHtml += `
-                <button onclick="fetchSubjectUsers(${currentSubjectId}, ${usersData.current_page + 1})"
-                    class="${usersData.current_page === usersData.last_page ? 'cursor-not-allowed opacity-50' : ''} relative inline-flex items-center px-2 py-2 rounded-r-md border border-white border-opacity-20 bg-white bg-opacity-10 text-sm font-medium text-white hover:bg-white hover:bg-opacity-20"
-                    ${usersData.current_page === usersData.last_page ? 'disabled' : ''}>
-                    <span class="sr-only">Next</span>
-                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                </button>`;
-
-            paginationHtml += `
-                    </span>
-                </div>
-            </div>
-        </nav>`;
-
-            paginationContainer.html(paginationHtml);
         }
 
         function closeUsersModal() {

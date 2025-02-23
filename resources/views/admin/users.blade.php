@@ -514,25 +514,7 @@
             }
         }
 
-        // دالة مساعدة لإظهار التنبيهات (اختياري)
-        function showAlert(message, type = 'success') {
-            const alertDiv = $(`
-                <div class="fixed top-4 right-4 px-4 py-2 rounded-lg ${
-                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                } text-white">
-                    ${message}
-                </div>
-            `);
-
-            $('body').append(alertDiv);
-
-            // إخفاء التنبيه بعد 3 ثواني
-            setTimeout(() => {
-                alertDiv.fadeOut(300, function() {
-                    $(this).remove();
-                });
-            }, 3000);
-        }
+ 
 
         function openAddModal() {
             $('#addModal').removeClass('hidden');

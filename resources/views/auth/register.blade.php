@@ -11,7 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen">
+<body class= " dark:bg-gradient-to-br from-blue-800 via-cyan-600  to-cyan-800 min-h-screen">
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="max-w-md w-full">
             <!-- Logo Container -->
@@ -130,7 +130,7 @@
                             </div>
                             <div class="ml-3">
                                 <label for="terms" class="text-sm text-gray-700 dark:text-gray-300">
-                                    I agree to the 
+                                    I agree to the
                                     <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Terms of Service</a>
                                     and
                                     <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Privacy Policy</a>
@@ -213,7 +213,7 @@
                 $(buttonId).on('click', function() {
                     const input = $(inputId);
                     const icon = $(this).find('i');
-                    
+
                     if (input.attr('type') === 'password') {
                         input.attr('type', 'text');
                         icon.removeClass('fa-eye').addClass('fa-eye-slash');
@@ -230,7 +230,7 @@
             // Form Submission
             $('#registerForm').on('submit', function(e) {
                 e.preventDefault();
-                
+
                 // Add loading state to button
                 const submitButton = $(this).find('button[type="submit"]');
                 const originalContent = submitButton.html();
@@ -276,7 +276,7 @@
                             .removeClass('hidden')
                             .find('.error-text')
                             .text(response.message || 'An error occurred');
-                        
+
                         // Shake animation for error
                         $('#errorMessage').addClass('animate-shake');
                         setTimeout(() => {

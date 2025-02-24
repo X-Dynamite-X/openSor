@@ -23,7 +23,7 @@
     <nav class="p-4">
         <div class="space-y-2">
             <!-- Dashboard -->
-            \
+
             <!-- Users Management -->
             <a href="{{ route('dashboard.users') }}"
                 class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('dashboard.users') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
@@ -35,6 +35,11 @@
                 <i class="fas fa-book w-6"></i>
                 <span>Subject</span>
             </a>
+            <a href="{{ route('chat.index') }}"
+            class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('message') ? 'bg-white bg-opacity-20 text-white' : 'text-white text-opacity-70 hover:bg-white hover:bg-opacity-10 transition duration-200' }}">
+            <i class="fas fa-comments w-6"></i>
+            <span>Message</span>
+        </a>
             <!-- Settings -->
 
         </div>

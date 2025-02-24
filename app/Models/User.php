@@ -46,20 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function configure()
-    {
-        return $this->afterCreating(function (User $user) {
-            if ($user->id !== 1) {
-
-                $user->assignRole('user');
-                $user->syncPermissions("not_active");
-            }
-        });
-    }
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');
     }
-
+    public function sendMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
 
 }

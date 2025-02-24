@@ -1,0 +1,39 @@
+<div class="overflow-y-auto h-[calc(100vh )]" id="conversation_list">
+    @forelse ($conversations as $conversation)
+        <div class="p-3 hover:bg-white/5 cursor-pointer {{ request()->query('chat') == $conversation->id ? 'bg-white/5' : '' }}"
+            onclick="window.location.href='{{ route('chat.show', $conversation->id) }}'">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($conversation->other_user->name) }}&background=random"
+                        alt="{{ $conversation->other_user->name }}" class="w-12 h-12 rounded-full">
+                    <span
+                        class="absolute bottom-0 right-0 w-3 h-3 bg-gray-500 border-2 border-white rounded-full"></span>
+                </div>
+
+                <div class="flex-1">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-white font-medium">{{ $conversation->other_user->name }}</h4>
+                        <span class="text-xs text-cyan-300">
+                            {{ $conversation->last_message ? $conversation->last_message->created_at->diffForHumans() : 'New' }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <p class="text-gray-300 text-sm truncate">
+                            {{ $conversation->last_message ? $conversation->last_message->text : 'No messages yet' }}
+                        </p>
+                        @if ($conversation->unread_count > 0)
+                            <span class="bg-cyan-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+                                {{ $conversation->unread_count }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="p-4 text-center text-gray-400">
+            <p>No conversations yet</p>
+        </div>
+    @endforelse
+</div>

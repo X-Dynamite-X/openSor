@@ -1,6 +1,7 @@
 @forelse ($users as $user)
     <div class="p-3 hover:bg-white/5 cursor-pointer {{ request()->query('chat') == $user->id ? 'bg-white/5' : '' }}"
-        onclick="window.location.href='{{ route('chat.show', $user->id) }}'">
+        onclick="createConversation({{$user->id}})">
+        
         <div class="flex items-center space-x-3">
             <div class="relative">
                 <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random"

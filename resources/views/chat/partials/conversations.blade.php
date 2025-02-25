@@ -1,7 +1,7 @@
-<div class="overflow-y-auto h-[calc(100vh )]" id="conversation_list">
+<div class="overflow-y-auto h-[84vh] max-h-[84] min-h-[84vh]" id="conversation_list">
     @forelse ($conversations as $conversation)
-        <div class="p-3 hover:bg-white/5 cursor-pointer {{ request()->query('chat') == $conversation->id ? 'bg-white/5' : '' }}"
-            onclick="window.location.href='{{ route('chat.show', $conversation->id) }}'">
+        <div class="p-3 hover:bg-white/5 cursor-pointer "
+            onclick="getMessageConversation({{$conversation->id}})">
             <div class="flex items-center space-x-3">
                 <div class="relative">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($conversation->other_user->name) }}&background=random"
@@ -14,7 +14,7 @@
                     <div class="flex justify-between items-start">
                         <h4 class="text-white font-medium">{{ $conversation->other_user->name }}</h4>
                         <span class="text-xs text-cyan-300">
-                            {{ $conversation->last_message ? $conversation->last_message->created_at->diffForHumans() : 'New' }}
+                            {{ $conversation->last_message ? $conversation->last_message_at : 'New' }}
                         </span>
                     </div>
 
@@ -23,7 +23,7 @@
                             {{ $conversation->last_message ? $conversation->last_message->text : 'No messages yet' }}
                         </p>
                         @if ($conversation->unread_count > 0)
-                            <span class="bg-cyan-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+                            <span class="bg-cyan-500 text-white text-xs rounded-full px-2 py-1 ml-2" id="unread_count">
                                 {{ $conversation->unread_count }}
                             </span>
                         @endif

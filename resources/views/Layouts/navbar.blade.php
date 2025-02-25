@@ -6,6 +6,7 @@
             </div>
             @unless (request()->routeIs('dashboard.*'))
                 <div class="flex items-center space-x-4">
+                    @auth
                     @role('admin')
                         <div>
                             <a href="{{ route('dashboard.users') }}"
@@ -31,6 +32,17 @@
                             <span>Message</span>
                         </a>
                     </div>
+                    <div class="  bottom-4 ">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="w-full flex items-center space-x-3 p-3 rounded-lg text-white text-opacity-70 hover:bg-red-500 hover:text-white transition duration-200">
+                                <i class="fas fa-sign-out-alt w-6"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                    @endauth
                 </div>
             @endunless
             <div class="flex items-center space-x-4">

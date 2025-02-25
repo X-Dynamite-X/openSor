@@ -57,16 +57,16 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
-        foreach ($users as $user) {
+        // foreach ($users as $user) {
 
         Conversation::create([
             'user_one_id' => 1,
-            'user_two_id' => $user->id,
+            'user_two_id' => 2,
         ]);
-        if ($user->id == 20) {
-           break;
-        }
-    }
+    //     if ($user->id == 20) {
+    //        break;
+    //     }
+    // }
 
     }
 }

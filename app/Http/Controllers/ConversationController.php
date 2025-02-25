@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
- use App\Models\Conversation;
+use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +11,7 @@ use App\Events\IsReadeMssages;
 use App\Events\NewConversationEvent;
 use App\Http\Requests\ConversationRequest;
 use App\Http\Resources\ConversationResource;
+
 class ConversationController extends Controller
 {
     //
@@ -20,13 +21,31 @@ class ConversationController extends Controller
 
         if ($request->ajax()) {
             $users = collect(); // مجموعة فارغة إذا لم يكن هناك بحث
+
             if ($request->has('search')) {
                 $searchTerm = $request->search;
+
+                // استرداد قائمة المستخدمين الموجودين في محادثات مع المستخدم الحالي
+                $existingConversationUsers = Conversation::where(function ($query) use ($userId) {
+                    $query->where('user_one_id', $userId)
+                        ->orWhere('user_two_id', $userId);
+                })
+                    ->get()
+                    ->flatMap(function ($conversation) use ($userId) {
+                        return [$conversation->user_one_id, $conversation->user_two_id];
+                    })
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                // البحث عن المستخدمين واستبعاد المستخدمين الموجودين في محادثات مع المستخدم الحالي
                 $users = User::whereAny(["name", "email"], 'LIKE', "%$searchTerm%")
                     ->where('id', '!=', $userId) // استبعاد المستخدم الحالي
+                    ->whereNotIn('id', $existingConversationUsers) // استبعاد المستخدمين الموجودين في محادثات
                     ->limit(15)
-                    ->get(['id', 'name', "email"]);
+                    ->get(['id', 'name', 'email']);
             }
+
             return response()->json([
                 'conversations' => $users,
                 'new_conversations_html' => view('chat.partials.users', compact('users'))->render(),
@@ -34,6 +53,7 @@ class ConversationController extends Controller
             ]);
         }
 
+        // استرداد المحادثات الحالية للمستخدم
         $conversations = Conversation::where("user_one_id", $userId)
             ->orWhere("user_two_id", $userId)
             ->orderBy('last_message_at', 'desc')
@@ -61,40 +81,55 @@ class ConversationController extends Controller
     //     // Add authorization check here
     //     return view('chat.show', compact('conversation'));
     // }
-    public function show(Request $request)
+    public function show(Conversation $conversation)
     {
-        $userId = Auth::id(); // استبدل بـ Auth::id() للحصول على ID المستخدمسجل دخوله
-        $serch = $request->input('serch');
+        $messages = $conversation->messages;
 
-        $conversations = User::whereAny(["name", "email"], 'LIKE', "%$serch%")
-            ->where('id', '!=', $userId) // استبعاد المستخدم الحالي
-            ->limit(15)
-            ->get(['id', 'name', "email"]);
-        return response()->json([
-            'conversations' => $conversations,
-            'message' => "Conversations fetched successfully."
+        $user = $conversation->user1->id === auth()->id() ? $conversation->user2 : $conversation->user1;
+
+        $isNotReadMessages = $conversation->messages->where('is_read', '!=', true)
+            ->where('sender_id', '!=', auth()->id());
+        foreach ($isNotReadMessages as $message) {
+            $message->update(['is_read' => true]);
+        }
+
+        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact('messages', 'user'))->render();
+        return response([
+            'messages_conversation_html' => $messages_conversation_html,
+            "messages" => "Show conversation successfully."
         ]);
     }
     public function store(ConversationRequest $request)
     {
-
+        // إنشاء المحادثة
         $conversation = Conversation::create([
             'user_one_id' => Auth::id(),
             'user_two_id' => $request->input('user_two_id'),
-        ])->load('messages', 'user1:id,name,email', 'user2:id,name,email');
+        ])->load('user1:id,name,email', 'user2:id,name,email');
 
-        // إعادة بناء البيانات مع تغيير اسم
-        $conversationEventData = $conversation->toArray();
-        $conversationEventData['other_user'] = $conversationEventData['user1'];
-        unset($conversationEventData['user1'], $conversationEventData['user2']);
-        event(new NewConversationEvent($conversationEventData));
+        // تحديد المستخدم الآخر
+        $otherUser = $conversation->user_one_id === Auth::id()
+            ? $conversation->user2
+            : $conversation->user1;
 
+        // تحويل البيانات إلى مصفوفة
         $conversationData = $conversation->toArray();
-        $conversationData['other_user'] = $conversationData['user2'];
-        unset($conversationData['user1'], $conversationData['user2']); // إزالة المفتاح القديم
+        $conversationData['other_user'] = $otherUser;
 
+        // إرسال حدث لإشعار النظام
+        event(new NewConversationEvent($conversationData));
+
+        // إعادة HTML جديد
+        $messages = $conversation->messages;
+        $user = $otherUser;
+        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact('messages', 'user'))->render();
+        $newConversationHtml = view('chat.partials.newConversation', compact('conversation', 'otherUser'))->render();
+
+        // إرجاع الاستجابة JSON
         return response()->json([
             'conversation' => $conversationData,
+            'new_conversation_html' => $newConversationHtml,
+            "messages_conversation_html"=>$messages_conversation_html,
             'message' => 'Conversation created successfully.',
         ]);
     }
@@ -108,7 +143,7 @@ class ConversationController extends Controller
         if (sizeof($isNotReadMessages) > 0) {
 
             // dd($isNotReadMessages);
-            broadcast(new IsReadeMssages($conversationId->id, $isNotReadMessages));
+            // broadcast(new IsReadeMssages($conversationId->id, $isNotReadMessages));
         }
         return response()->json(['message' => 'Conversation opened successfully.', "isNotReadMessages" => $isNotReadMessages]);
     }

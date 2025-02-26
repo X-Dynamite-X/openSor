@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+ use \App\Http\Middleware\chakeISAdmin;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,7 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            "chakeISAdmin" => chakeISAdmin::class,
         ]);
+        // "chakeISAdmin" => \App\Http\Middleware\chakeISAdmin::class,
+
+        // $middleware->append(chakeISAdmin::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

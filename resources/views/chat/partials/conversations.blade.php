@@ -1,6 +1,6 @@
 <div class="overflow-y-auto h-[84vh] max-h-[84] min-h-[84vh]" id="conversation_list">
     @forelse ($conversations as $conversation)
-        <div class="p-3 hover:bg-white/5 cursor-pointer "
+        <div class="p-3 hover:bg-white/5 cursor-pointer " id="conversation_{{$conversation->id}}"
             onclick="getMessageConversation({{$conversation->id}})">
             <div class="flex items-center space-x-3">
                 <div class="relative">
@@ -12,14 +12,14 @@
 
                 <div class="flex-1">
                     <div class="flex justify-between items-start">
-                        <h4 class="text-white font-medium">{{ $conversation->other_user->name }}</h4>
-                        <span class="text-xs text-cyan-300">
+                        <h4 class="text-white font-medium" >{{ $conversation->other_user->name }}</h4>
+                        <span class="text-xs text-cyan-300"id="last_message_at_{{$conversation->id}}">
                             {{ $conversation->last_message ? $conversation->last_message_at : 'New' }}
                         </span>
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <p class="text-gray-300 text-sm truncate">
+                        <p class="text-gray-300 text-sm truncate" id="last_message_text_{{$conversation->id}}">
                             {{ $conversation->last_message ? $conversation->last_message->text : 'No messages yet' }}
                         </p>
                         @if ($conversation->unread_count > 0)

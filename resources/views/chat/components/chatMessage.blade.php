@@ -1,4 +1,4 @@
-<div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[77vh]" id="chat-messages">
+<div class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[77vh]" id="chat_messages">
     <!-- Messages Loop -->
     @foreach ($messages as $message)
         <div

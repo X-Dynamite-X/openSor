@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\NewMessageEvent;
 use App\Http\Requests\TextMessageRequest;
 use App\Models\Conversation;
+use App\Models\User;
+
 
 class MessageController extends Controller
 {
@@ -22,16 +24,16 @@ class MessageController extends Controller
                 'conversation_id' => $request->input('conversation_id'),
                 'text' => $request->input('text'),
                 "is_read"=>false,
-                'created_at' => $request->input('created_at'),
-                "updated_at" => null,
+                "created_at"=>now()
             ]
         );
         Conversation::where('id', $request->input('conversation_id'))->update([
             'last_message' => $request->input('text'),
             'last_message_at' => now(),
         ]);
-
-        event(new NewMessageEvent($message));
+        $user = User::find($message->sender_id);
+        $response_message_html = view("chat.components.reseveMessage", compact('message', 'user'))->render();
+        event(new NewMessageEvent($response_message_html,$message));
         $new_message_html = view("chat.components.sendNewMessage", compact('message'))->render();
         return response()->json([
             'newMessage' => $message,

@@ -17,7 +17,7 @@ Route::get('/', function () {
 require __DIR__.'/chat.php';
 
 
-Route::get('/home', function () {
+Route::  get('/home', function () {
     return redirect()->route('chat.index');
 })->name('home');
 

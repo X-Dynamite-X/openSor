@@ -21,11 +21,15 @@
         <!-- Chat Area -->
         <div class="flex-1 flex flex-col  overflow-y-scrole" id="chat_area">
 
-    </div>
-@endsection
+        </div>
+    @endsection
 
-@section('script')
-    <script src="{{ asset('js/getConversiton.js') }}"></script>
-    <script></script>
+    @section('script')
+        <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
-@endsection
+
+        <script src="{{ asset('js/pusharConction.js') }}"></script>
+        <script src="{{ asset('js/getConversiton.js') }}"></script>
+
+        <script></script>
+    @endsection

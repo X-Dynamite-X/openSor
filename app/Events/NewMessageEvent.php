@@ -11,27 +11,22 @@ use Illuminate\Queue\SerializesModels;
 class NewMessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $response_message_html;
     public $message;
-    public function __construct($message)
+
+    public function __construct($response_message_html,$message)
     {
         $this->message = $message;
+        $this->response_message_html = $response_message_html;
+
     }
     public function broadcastOn()
     {
-        return new PrivateChannel('conversation_' . $this->message['conversation_id']);
+        return ['conversation_' . $this->message['conversation_id']];
     }
     public function broadcastAs()
     {
         return 'new-message';
     }
-    public function broadcastWith()
-    {
-        return [
-            "id" => $this->message->id,
-            'text' => $this->message->text,
-            'created_at' => $this->message->created_at->format('j/n/Y, g:i:s A'),
-            'sender_id' => $this->message->sender_id,
-            'conversation_id' => $this->message->conversation_id,
-        ];
-    }
+
 }

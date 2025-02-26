@@ -1,5 +1,6 @@
 <div class="bg-white/5 p-4 border-t border-blue-700 ">
     <form class="flex space-x-2">
+        @csrf
         <div class="flex-1 relative">
             <input type="text" id="messageInput"
                 class="w-full bg-white/10 text-white rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"

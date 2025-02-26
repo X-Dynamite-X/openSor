@@ -13,10 +13,7 @@ class ConversationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if (auth()) {
-            return true;
-        }
-        return true;
+        return Auth::check();
     }
 
     /**

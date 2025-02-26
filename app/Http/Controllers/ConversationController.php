@@ -11,6 +11,7 @@ use App\Events\IsReadeMssages;
 use App\Events\NewConversationEvent;
 use App\Http\Requests\ConversationRequest;
 use App\Http\Resources\ConversationResource;
+use App\Events\testEvents;
 
 class ConversationController extends Controller
 {
@@ -25,7 +26,7 @@ class ConversationController extends Controller
             if ($request->has('search')) {
                 $searchTerm = $request->search;
 
-                // استرداد قائمة المستخدمين الموجودين في محادثات مع المستخدم الحالي
+        // استرداد قائمة المستخدمين الموجودين في محادثات مع المستخدم الحالي
                 $existingConversationUsers = Conversation::where(function ($query) use ($userId) {
                     $query->where('user_one_id', $userId)
                         ->orWhere('user_two_id', $userId);
@@ -92,8 +93,9 @@ class ConversationController extends Controller
         foreach ($isNotReadMessages as $message) {
             $message->update(['is_read' => true]);
         }
+        event(new testEvents('hello world'));
 
-        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact('messages', 'user'))->render();
+        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact('messages', 'user',"conversation"))->render();
         return response([
             'messages_conversation_html' => $messages_conversation_html,
             "messages" => "Show conversation successfully."
@@ -122,7 +124,7 @@ class ConversationController extends Controller
         // إعادة HTML جديد
         $messages = $conversation->messages;
         $user = $otherUser;
-        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact('messages', 'user'))->render();
+        $messages_conversation_html = view(  'chat.partials.chatConvestion', compact("conversation",'messages', 'user'))->render();
         $newConversationHtml = view('chat.partials.newConversation', compact('conversation', 'otherUser'))->render();
 
         // إرجاع الاستجابة JSON
@@ -133,19 +135,19 @@ class ConversationController extends Controller
             'message' => 'Conversation created successfully.',
         ]);
     }
-    public function isOpenConversation(Conversation $conversationId)
-    {
-        $isNotReadMessages = $conversationId->messages->where('is_read', '!=', true)
-            ->where('sender_id', '!=', Auth::id());
-        foreach ($isNotReadMessages as $message) {
-            $message->update(['is_read' => true]);
-        }
-        if (sizeof($isNotReadMessages) > 0) {
+    // public function isOpenConversation(Conversation $conversationId)
+    // {
+    //     $isNotReadMessages = $conversationId->messages->where('is_read', '!=', true)
+    //         ->where('sender_id', '!=', Auth::id());
+    //     foreach ($isNotReadMessages as $message) {
+    //         $message->update(['is_read' => true]);
+    //     }
+    //     if (sizeof($isNotReadMessages) > 0) {
 
-            // dd($isNotReadMessages);
-            // broadcast(new IsReadeMssages($conversationId->id, $isNotReadMessages));
-        }
-        return response()->json(['message' => 'Conversation opened successfully.', "isNotReadMessages" => $isNotReadMessages]);
-    }
+    //         // dd($isNotReadMessages);
+    //         // broadcast(new IsReadeMssages($conversationId->id, $isNotReadMessages));
+    //     }
+    //     return response()->json(['message' => 'Conversation opened successfully.', "isNotReadMessages" => $isNotReadMessages]);
+    // }
     public function destroy() {}
 }

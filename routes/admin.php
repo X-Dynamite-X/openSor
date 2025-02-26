@@ -11,7 +11,7 @@ use App\Http\Controllers\SubjectUserController;
 
 
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth',"chakeISAdmin", 'role:admin',])->group(function () {
     Route::get('/dashboard/users', [DashboardController::class, 'index'])->name('dashboard.users');
     Route::post('/users', [DashboardController::class, 'store'])->name('users.store');
     Route::delete('/users/{user}', [DashboardController::class, 'destroy']);

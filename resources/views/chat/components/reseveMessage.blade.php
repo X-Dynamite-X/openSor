@@ -1,3 +1,4 @@
+ 
 <div class="flex items-start space-x-2 animate-fade-in-down justify-start">
     <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" alt="User Avatar"
         class="w-8 h-8 rounded-full">

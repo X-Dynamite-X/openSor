@@ -30,7 +30,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-
+            
             return response()->json([
                 'success' => true,
                 'redirect' => url('/dashboard/users')

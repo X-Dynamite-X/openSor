@@ -11,8 +11,8 @@ use Illuminate\Queue\SerializesModels;
 class NewMessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $response_message_html;
-    public $message;
+    public $response_message_html ,$message ;
+    // public $message;
 
     public function __construct($response_message_html,$message)
     {
@@ -28,5 +28,17 @@ class NewMessageEvent implements ShouldBroadcast
     {
         return 'new-message';
     }
-
+    public function broadcastWith()
+    {
+        return [
+            'message' => [
+                'id' => $this->message->id,
+                'text' => $this->message->text,
+                'created_at' => $this->message->created_at->format('j/n/Y, g:i:s'),
+                'sender_id' => $this->message->sender_id,
+                'conversation_id' => $this->message->conversation_id,
+            ],
+            'response_message_html' => $this->response_message_html
+        ];
+    }
 }

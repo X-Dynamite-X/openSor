@@ -59,13 +59,9 @@ function getMessageConversation(conversationId) {
             conversation_id = conversationId || null;
             $("#unread_count").remove();
             console.log(response);
-            if($("#chat_header").data("conversation_active")){
-                closeBind($("#chat_header").data("conversation_active"));
-            }
             $("#chat_area").empty();
             $("#chat_area").html(response.messages_conversation_html);
-            openBind(conversationId);
-
+            setTimeout(scrollToBottom, 100);
         },
         error: function (xhr, status, error) {
             console.error(error);
@@ -112,6 +108,7 @@ function sendmessage() {
         success: function (response) {
             $("#messageInput").val("");
             $("#chat_messages").append(response.new_message_html);
+            setTimeout(scrollToBottom, 100);
             console.log(response);
         },
         error: function (xhr, status, error) {

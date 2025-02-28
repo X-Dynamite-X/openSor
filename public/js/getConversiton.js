@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
- function getMessageConversation(conversationId) {
+function getMessageConversation(conversationId) {
     $.ajax({
         url: `/chat/${conversationId}`,
         type: "get",
@@ -87,7 +87,6 @@ function createConversation(userId) {
             $("#no_conversations").remove();
             const newConversationId = response.conversation.id;
             subscribeToConversation(newConversationId);
-
         },
         error: function (xhr, status, error) {
             console.error(error);
@@ -96,7 +95,7 @@ function createConversation(userId) {
     });
 }
 function sendmessage() {
-    let conversation_id =$("#chat_header").data("conversation_active");
+    let conversation_id = $("#chat_header").data("conversation_active");
     let text = $("#messageInput").val();
     $.ajax({
         url: `/chat/${conversation_id}/message`,
@@ -109,6 +108,10 @@ function sendmessage() {
         success: function (response) {
             $("#messageInput").val("");
             $("#chat_messages").append(response.new_message_html);
+            $(`#last_message_text_${conversation_id}`).text(response.newMessage.text);
+            $(`#last_message_at_${conversation_id}`).text(
+                response.newMessage.created_at.format('j/n/Y, g:i:s')
+            );
             moveConversationsInLastMessage(conversation_id);
             setTimeout(scrollToBottom, 100);
 

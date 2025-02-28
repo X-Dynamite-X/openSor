@@ -13,7 +13,7 @@
                 <div class="flex-1">
                     <div class="flex justify-between items-start">
                         <h4 class="text-white font-medium" >{{ $conversation->other_user->name }}</h4>
-                        <span class="text-xs text-cyan-300"id="last_message_at_{{$conversation->id}}">
+                        <span class="text-xs text-cyan-300" id="last_message_at_{{$conversation->id}}">
                             {{ $conversation->last_message ? $conversation->last_message_at : 'New' }}
                         </span>
                     </div>

@@ -8,10 +8,10 @@
         </div>
         <div class="flex-1">
             <div class="flex justify-between items-start">
-                <h4 class="text-white font-medium" id="last_message_at_{{$conversation->id}}">{{ $conversation->user1->name }}</h4>
+                <h4 class="text-xs text-cyan-300 font-medium" id="last_message_at_{{$conversation->id}}">{{ $conversation->user1->name }}</h4>
                 <span class="text-xs text-cyan-300">New</span>
             </div>
-            <div class="flex items-center justify-between" id="last_message_text_{{$conversation->id}}">
+            <div class="text-gray-300 text-sm  flex items-center justify-between" id="last_message_text_{{$conversation->id}}">
                 <p class="text-gray-300 text-sm truncate">No messages yet</p>
             </div>
         </div>

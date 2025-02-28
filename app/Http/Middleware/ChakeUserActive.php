@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class chakeISAdmin
+class ChakeUserActive
 {
     /**
      * Handle an incoming request.
@@ -15,11 +15,19 @@ class chakeISAdmin
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-        {
-
-        if (!Auth::user()->hasRole("admin")) {
-            return redirect()->route('home');
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
         }
+
+        $user = auth()->user();
+
+        // إذا كان المستخدم غير مفعل أو ليس لديه دور الأدمن
+        if ($user->hasPermissionTo('not_active') && !$user->hasRole('admin')) {
+            Auth::logout();
+            return redirect()->route('isActive');
+        }
+
         return $next($request);
     }
 }

@@ -5,7 +5,7 @@ use App\Http\Controllers\MessageController;
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth',"permission:active"])->group(function () {
     // المحادثات
     Route::prefix('chat')->group(function () {
         // عرض قائمة المحادثات

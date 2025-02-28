@@ -3,11 +3,19 @@
 
 // use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\UserInformationsController;
 // المسارات العامة
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// })->middleware(["auth","ChakeUserActive"])
+
+
+Route::get("/",[UserInformationsController::class , "index"])->name('home')->middleware(["auth","ChakeUserActive"]);
+
+
+Route::get('/isActive', function () {
+    return view('userNotActive');
+})->middleware(["guest"])->name('isActive');
 
  require __DIR__.'/auth.php';
 
@@ -15,9 +23,4 @@ Route::get('/', function () {
 
 
 require __DIR__.'/chat.php';
-
-
-Route::  get('/home', function () {
-    return redirect()->route('chat.index');
-})->name('home');
 

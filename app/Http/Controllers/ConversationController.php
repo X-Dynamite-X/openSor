@@ -77,11 +77,7 @@ class ConversationController extends Controller
         return view('chat.index', compact('conversations'));
     }
 
-    // public function show(Conversation $conversation)
-    // {
-    //     // Add authorization check here
-    //     return view('chat.show', compact('conversation'));
-    // }
+
     public function show(Conversation $conversation)
     {
         $messages = $conversation->messages;
@@ -119,7 +115,9 @@ class ConversationController extends Controller
         $conversationData['other_user'] = $otherUser;
 
         // إرسال حدث لإشعار النظام
-        event(new NewConversationEvent($conversationData));
+        $newConversationHtml = view('chat.partials.resaveNewConvestion', compact('conversation', 'otherUser'))->render();
+
+        event(new NewConversationEvent($conversationData,$newConversationHtml));
 
         // إعادة HTML جديد
         $messages = $conversation->messages;

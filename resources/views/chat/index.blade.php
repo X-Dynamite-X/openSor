@@ -31,5 +31,20 @@
         <script src="{{ asset('js/pusharConction.js') }}"></script>
         <script src="{{ asset('js/getConversiton.js') }}"></script>
 
-        <script></script>
+        <script>
+            function resaveNewConvestion() {
+                const user_id = {{auth()->user()->id}}
+                const channel = pusher.subscribe(`user_${user_id}`);
+                channel.bind('add-conversation', function(data) {
+                    // إضافة المحادثة الجديدة إلى القائمة
+                    $("#conversation_list").prepend(data.new_conversation_html);
+                    $("#no_conversations").remove();
+                    
+                    // الاشتراك في قناة المحادثة الجديدة
+                    const newConversationId = data.conversation.id;
+                    subscribeToConversation(newConversationId);
+                });
+            }
+            resaveNewConvestion();
+        </script>
     @endsection

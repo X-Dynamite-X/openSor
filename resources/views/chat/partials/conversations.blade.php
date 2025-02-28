@@ -32,7 +32,7 @@
             </div>
         </div>
     @empty
-        <div class="p-4 text-center text-gray-400">
+        <div class="p-4 text-center text-gray-400" id="no_conversations">
             <p>No conversations yet</p>
         </div>
     @endforelse

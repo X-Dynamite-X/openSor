@@ -1,5 +1,3 @@
-
-
 document.addEventListener("DOMContentLoaded", function () {
     // Auto scroll to bottom
     const messagesContainer = document.getElementById("chat-messages");
@@ -48,10 +46,8 @@ document.addEventListener("DOMContentLoaded", function () {
             $("#search_conversation_list").empty();
         }
     }
-
 });
-let conversation_id = null;
-function getMessageConversation(conversationId) {
+ function getMessageConversation(conversationId) {
     $.ajax({
         url: `/chat/${conversationId}`,
         type: "get",
@@ -88,6 +84,10 @@ function createConversation(userId) {
             $("#conversation_list").removeClass("hidden");
             $("#search_conversation_list").addClass("hidden");
             $("#search_conversation_list").empty();
+            $("#no_conversations").remove();
+            const newConversationId = response.conversation.id;
+            subscribeToConversation(newConversationId);
+
         },
         error: function (xhr, status, error) {
             console.error(error);
@@ -96,6 +96,7 @@ function createConversation(userId) {
     });
 }
 function sendmessage() {
+    let conversation_id =$("#chat_header").data("conversation_active");
     let text = $("#messageInput").val();
     $.ajax({
         url: `/chat/${conversation_id}/message`,
@@ -108,12 +109,13 @@ function sendmessage() {
         success: function (response) {
             $("#messageInput").val("");
             $("#chat_messages").append(response.new_message_html);
+            moveConversationsInLastMessage(conversation_id);
             setTimeout(scrollToBottom, 100);
+
             console.log(response);
         },
         error: function (xhr, status, error) {
             console.error(error);
-
         },
     });
 }

@@ -14,17 +14,32 @@ function initializeChannels() {
 
     conversationElements.forEach((element) => {
         const conversationId = element.id.replace('conversation_', '');
-        const channel = pusher.subscribe(`conversation_${conversationId}`);
-        channels[`conversation_${conversationId}`] = channel;
-
-        // إعداد المستمع لكل قناة
-        channel.bind("new-message", function(data) {
-            handleNewMessage(conversationId, data);
-        });
+        subscribeToConversation(conversationId);
     });
 }
 
-// معالجة الرسائل الجديدة
+// دالة للاشتراك في قناة محادثة واحدة
+function subscribeToConversation(conversationId) {
+     if (!channels[`conversation_${conversationId}`]) {
+        const channel = pusher.subscribe(`conversation_${conversationId}`);
+        channels[`conversation_${conversationId}`] = channel;
+
+         channel.bind("new-message", function(data) {
+            handleNewMessage(conversationId, data);
+        });
+    }
+    return channels[`conversation_${conversationId}`];
+}
+
+
+// function unsubscribeFromConversation(conversationId) {
+//     const channelName = `conversation_${conversationId}`;
+//     if (channels[channelName]) {
+//         pusher.unsubscribe(channelName);
+//         delete channels[channelName];
+//     }
+// }
+
 function handleNewMessage(conversationId, data) {
     const currentUserId = $("#chat_header").data("user_id");
     const isCurrentConversationOpen = $("#chat_area").find(`#chat_messages`).length > 0;
@@ -56,8 +71,7 @@ function handleNewMessage(conversationId, data) {
     }
 }
 
-// تحريك المحادثة إلى أعلى القائمة
-function moveConversationsInLastMessage(conversation_id) {
+ function moveConversationsInLastMessage(conversation_id) {
     const conversationList = $("#conversation_list");
     const conversation = $(`#conversation_${conversation_id}`);
     if (conversation.length) {
@@ -73,7 +87,10 @@ function scrollToBottom() {
     }
 }
 
-// تهيئة القنوات عند تحميل الصفحة
-$(document).ready(function() {
+
+
+
+
+ $(document).ready(function() {
     initializeChannels();
 });

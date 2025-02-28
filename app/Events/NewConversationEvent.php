@@ -15,19 +15,27 @@ class NewConversationEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $conversation;
+    public $conversation ,$newConversationHtml;
 
-    public function __construct($conversation)
+    public function __construct($conversation,$newConversationHtml)
     {
         $this->conversation = $conversation;
+        $this->newConversationHtml = $newConversationHtml;
     }
     public function broadcastOn()
     {
-        return new PrivateChannel('user_' . $this->conversation['user_two_id']);
+        return ['user_' . $this->conversation['user_two_id']];
     }
 
     public function broadcastAs()
     {
         return 'add-conversation';
+    }
+    public function broadcastWith()
+    {
+        return [
+            'conversation' => $this->conversation,
+            'new_conversation_html' => $this->newConversationHtml,
+        ];
     }
 }

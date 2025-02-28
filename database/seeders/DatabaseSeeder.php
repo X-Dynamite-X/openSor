@@ -42,21 +42,21 @@ class DatabaseSeeder extends Seeder
         Subject::factory(20)->create();
 
         // Create subject_user relationships
-        $users = User::all();
-        $subjects = Subject::all();
+        // $users = User::all();
+        // $subjects = Subject::all();
 
-        foreach ($users as $user) {
-            // Assign 3-8 random subjects to each user
-            $randomSubjects = $subjects->random(fake()->numberBetween(3, 8));
+        // foreach ($users as $user) {
+        //     // Assign 3-8 random subjects to each user
+        //     $randomSubjects = $subjects->random(fake()->numberBetween(3, 8));
 
-            foreach ($randomSubjects as $subject) {
-                SubjectUser::create([
-                    'user_id' => $user->id,
-                    'subject_id' => $subject->id,
-                    'mark' => fake()->numberBetween(0, 100),
-                ]);
-            }
-        }
+        //     foreach ($randomSubjects as $subject) {
+        //         SubjectUser::create([
+        //             'user_id' => $user->id,
+        //             'subject_id' => $subject->id,
+        //             'mark' => fake()->numberBetween(0, 100),
+        //         ]);
+        //     }
+        // }
 
 
     }

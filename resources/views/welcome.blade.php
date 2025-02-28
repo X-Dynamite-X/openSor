@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-900 py-8">
+<div class="min-h-screen   py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Student Profile Header -->
         <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-8">

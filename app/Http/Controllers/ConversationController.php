@@ -19,14 +19,15 @@ class ConversationController extends Controller
     public function index(Request $request)
     {
         $userId = Auth::id();
+        $currentUser = Auth::user();
 
         if ($request->ajax()) {
-            $users = collect(); // مجموعة فارغة إذا لم يكن هناك بحث
+            $users = collect();
 
             if ($request->has('search')) {
                 $searchTerm = $request->search;
 
-        // استرداد قائمة المستخدمين الموجودين في محادثات مع المستخدم الحالي
+                // استرداد قائمة المستخدمين الموجودين في محادثات مع المستخدم الحالي
                 $existingConversationUsers = Conversation::where(function ($query) use ($userId) {
                     $query->where('user_one_id', $userId)
                         ->orWhere('user_two_id', $userId);
@@ -39,12 +40,22 @@ class ConversationController extends Controller
                     ->values()
                     ->all();
 
-                // البحث عن المستخدمين واستبعاد المستخدمين الموجودين في محادثات مع المستخدم الحالي
-                $users = User::whereAny(["name", "email"], 'LIKE', "%$searchTerm%")
+                // إنشاء query builder أساسي
+                $query = User::whereAny(["name", "email"], 'LIKE', "%$searchTerm%")
                     ->where('id', '!=', $userId) // استبعاد المستخدم الحالي
-                    ->whereNotIn('id', $existingConversationUsers) // استبعاد المستخدمين الموجودين في محادثات
-                    ->limit(15)
-                    ->get(['id', 'name', 'email']);
+                    ->whereNotIn('id', $existingConversationUsers);
+
+                // إذا لم يكن المستخدم أدمن، نقوم بتصفية المستخدمين حسب المواد المشتركة
+                if (!$currentUser->hasRole('admin')) {
+                    // الحصول على معرفات المواد التي يدرسها المستخدم الحالي
+                    $userSubjectIds = $currentUser->subjects()->pluck('subjects.id');
+
+                    $query->whereHas('subjects', function($q) use ($userSubjectIds) {
+                        $q->whereIn('subjects.id', $userSubjectIds);
+                    });
+                }
+
+                $users = $query->limit(15)->get(['id', 'name', 'email']);
             }
 
             return response()->json([

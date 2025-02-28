@@ -12,7 +12,7 @@
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
             </div>
-            <div class="overflow-y-auto h-[calc(100vh )] hidden" id="search_conversation_list"></div>
+            <div class="overflow-y-auto h-[84vh] max-h-[84] min-h-[84vh] hidden" id="search_conversation_list"></div>
             <!-- Contacts List -->
             @include('chat.partials.conversations', ['conversations' => $conversations])
 
@@ -39,7 +39,7 @@
                     // إضافة المحادثة الجديدة إلى القائمة
                     $("#conversation_list").prepend(data.new_conversation_html);
                     $("#no_conversations").remove();
-                    
+
                     // الاشتراك في قناة المحادثة الجديدة
                     const newConversationId = data.conversation.id;
                     subscribeToConversation(newConversationId);
